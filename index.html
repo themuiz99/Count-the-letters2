@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>เครื่องมือนับตัวอักษรและจัดการข้อความ</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,209 +14,189 @@
         body {
             font-family: 'Noto Sans Thai', sans-serif;
         }
+        /* ป้องกันการเลื่อนหน้าจอระบบหลัก */
+        html, body {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
+<body class="bg-slate-950 text-slate-100 h-[100dvh] flex flex-col justify-between p-3 selection:bg-emerald-500 selection:text-slate-950">
 
-    <!-- ส่วนหัวหน้าเว็บ -->
-    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <div class="flex items-center gap-3">
-                <div class="bg-emerald-500 text-slate-950 p-2.5 rounded-2xl font-black text-xl shadow-lg shadow-emerald-500/20">
-                    ✍️
-                </div>
-                <div>
-                    <h1 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-                        เครื่องมือนับตัวอักษรและจัดการข้อความ
-                    </h1>
-                    <p class="text-xs text-slate-400">ระบบตรวจสอบจำนวนคำ ลบสัญลักษณ์พิเศษ และปรับแต่งข้อความ</p>
-                </div>
+    <!-- ส่วนหัวหน้าเว็บ (Header) ขนาดมินิมอลสุดๆ -->
+    <header class="flex flex-row justify-between items-center pb-2 border-b border-slate-900/80">
+        <div class="flex items-center gap-1.5">
+            <span class="text-base">✍️</span>
+            <div>
+                <h1 class="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+                    เครื่องมือนับตัวอักษรและจัดการข้อความ
+                </h1>
+                <p class="text-[9px] text-slate-500">นับอักษรและจัดการข้อความด่วน</p>
             </div>
-            <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-full border border-slate-700 font-medium">
-                เวอร์ชัน 1.1 (เสถียร)
-            </span>
         </div>
+        <span class="text-[8px] bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800 font-medium">
+            v1.3
+        </span>
     </header>
 
-    <!-- ส่วนเนื้อหาหลัก -->
-    <main class="max-w-4xl w-full mx-auto px-4 py-6 flex-grow flex flex-col gap-6">
+    <!-- ส่วนเนื้อหาหลัก จัดวางให้พอดีหน้าจอโดยใช้ Flexbox -->
+    <main class="flex-grow flex flex-col gap-2.5 my-2 min-h-0">
         
-        <!-- แผงแสดงสถิติการตรวจนับ -->
-        <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between transition-all hover:border-emerald-500/50">
-                <span class="text-xs text-slate-400 font-bold">ตัวอักษรทั้งหมด (รวมช่องว่าง)</span>
-                <div class="flex items-baseline gap-1 mt-2">
-                    <span id="charCount" class="text-3xl font-black text-emerald-400">0</span>
-                    <span class="text-xs text-slate-500">ตัว</span>
+        <!-- แผงแสดงสถิติการตรวจนับ (ย่อขนาดและกระชับพื้นที่) -->
+        <section class="grid grid-cols-2 gap-2">
+            <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-900 flex flex-col justify-center">
+                <span class="text-[10px] text-slate-400 font-bold">รวมสเปซ</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="charCount" class="text-lg font-black text-emerald-400">0</span>
+                    <span class="text-[9px] text-slate-500">ตัว</span>
                 </div>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between transition-all hover:border-emerald-500/50">
-                <span class="text-xs text-slate-400 font-bold">ตัวอักษร (ไม่รวมช่องว่าง)</span>
-                <div class="flex items-baseline gap-1 mt-2">
-                    <span id="charNoSpaceCount" class="text-3xl font-black text-emerald-400">0</span>
-                    <span class="text-xs text-slate-500">ตัว</span>
+            <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-900 flex flex-col justify-center">
+                <span class="text-[10px] text-slate-400 font-bold">ไม่รวมสเปซ</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="charNoSpaceCount" class="text-lg font-black text-emerald-400">0</span>
+                    <span class="text-[9px] text-slate-500">ตัว</span>
                 </div>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between transition-all hover:border-emerald-500/50">
-                <span class="text-xs text-slate-400 font-bold">จำนวนคำทั้งหมด</span>
-                <div class="flex items-baseline gap-1 mt-2">
-                    <span id="wordCount" class="text-3xl font-black text-emerald-400">0</span>
-                    <span class="text-xs text-slate-500">คำ</span>
+            <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-900 flex flex-col justify-center">
+                <span class="text-[10px] text-slate-400 font-bold">จำนวนคำ</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="wordCount" class="text-lg font-black text-emerald-400">0</span>
+                    <span class="text-[9px] text-slate-500">คำ</span>
                 </div>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between transition-all hover:border-emerald-500/50">
-                <span class="text-xs text-slate-400 font-bold">จำนวนบรรทัด</span>
-                <div class="flex items-baseline gap-1 mt-2">
-                    <span id="lineCount" class="text-3xl font-black text-emerald-400">0</span>
-                    <span class="text-xs text-slate-500">บรรทัด</span>
+            <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-900 flex flex-col justify-center">
+                <span class="text-[10px] text-slate-400 font-bold">จำนวนบรรทัด</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="lineCount" class="text-lg font-black text-emerald-400">0</span>
+                    <span class="text-[9px] text-slate-500">แถว</span>
                 </div>
             </div>
         </section>
 
-        <!-- พื้นที่ป้อนข้อความ -->
-        <section class="flex flex-col gap-2">
+        <!-- พื้นที่ป้อนข้อความ (ยืดหยุ่นตามพื้นที่ว่างที่เหลือ) -->
+        <section class="flex-grow flex flex-col gap-1 min-h-0">
             <div class="flex justify-between items-center px-1">
-                <label for="editor" class="text-sm font-bold text-slate-300 flex items-center gap-2">
-                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    กรุณากรอกหรือวางข้อความของตะเองที่นี่เลยจ้า
+                <label for="editor" class="text-[10px] font-bold text-slate-400 flex items-center gap-1">
+                    <span class="inline-block w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                    กรอกหรือวางข้อความของตะเองที่นี่เลยจ้า
                 </label>
-                <span id="saveStatus" class="text-xs text-slate-500 transition-opacity duration-300 opacity-0">บันทึกข้อมูลชั่วคราวแล้ว</span>
+                <span id="saveStatus" class="text-[9px] text-slate-500 transition-opacity duration-300 opacity-0">เซฟชั่วคราวแล้ว</span>
             </div>
-            <div class="relative">
+            <div class="relative flex-grow min-h-0">
                 <textarea 
                     id="editor" 
-                    rows="10" 
-                    class="w-full bg-slate-900 border-2 border-slate-800 focus:border-emerald-500 rounded-2xl p-4 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-0 transition-colors resize-y leading-relaxed text-base"
-                    placeholder="เริ่มต้นพิมพ์หรือวางข้อความของคุณตรงนี้..."
+                    class="w-full h-full bg-slate-900 border border-slate-850 focus:border-emerald-500 rounded-xl p-3 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-0 transition-colors resize-none leading-relaxed text-sm"
+                    placeholder="พิมพ์หรือวางข้อความตรงนี้..."
                 ></textarea>
-                <!-- ปุ่มเคลียร์ข้อความ -->
+                <!-- ปุ่มเคลียร์ข้อความแบบเล็กกะทัดรัด -->
                 <button 
                     onclick="clearText()" 
-                    class="absolute bottom-4 right-4 bg-red-950/80 hover:bg-red-900 text-red-200 px-3 py-1.5 rounded-xl text-xs font-bold border border-red-800/50 transition-colors flex items-center gap-1.5 backdrop-blur"
+                    class="absolute bottom-2 right-2 bg-red-950/80 hover:bg-red-900 text-red-200 px-2 py-1 rounded-lg text-[9px] font-bold border border-red-800/40 transition-colors flex items-center gap-1 backdrop-blur"
                 >
-                    🗑️ ล้างข้อความทั้งหมด
+                    🗑️ ล้างทั้งหมด
                 </button>
             </div>
         </section>
 
-        <!-- แผงเครื่องมือควบคุมการทำงาน -->
-        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
-            <h2 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                🛠️ แผงเครื่องมือสำหรับจัดการข้อความ
-            </h2>
+        <!-- แผงเครื่องมือควบคุมการทำงาน (ตัดคำอธิบายออก เหลือเพียงปุ่มกดขนาดพอดีมือ) -->
+        <section class="bg-slate-900/40 border border-slate-900 rounded-xl p-2.5 flex flex-col gap-2">
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <div class="grid grid-cols-3 gap-1.5">
                 
                 <!-- เครื่องมือลบสัญลักษณ์พิเศษ -->
                 <button 
                     onclick="removeSymbols()" 
-                    class="bg-slate-800/80 hover:bg-slate-800 text-slate-200 p-3 rounded-xl border border-slate-700/50 text-left transition-all hover:border-emerald-500/30 flex items-start gap-3 group"
+                    class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95"
                 >
-                    <span class="text-lg group-hover:scale-110 transition-transform">✨</span>
-                    <div>
-                        <div class="font-bold text-xs text-slate-200">ลบสัญลักษณ์พิเศษ</div>
-                        <p class="text-[10px] text-slate-400 mt-0.5">ลบเครื่องหมายวรรคตอน จุด และสัญลักษณ์พิเศษ เหลือไว้เฉพาะตัวอักษรและตัวเลข</p>
-                    </div>
+                    <span class="text-sm">✨</span>
+                    <span class="text-[10px] font-bold">ลบสัญลักษณ์</span>
                 </button>
 
                 <!-- เครื่องมือลบตัวเลข -->
                 <button 
                     onclick="removeNumbers()" 
-                    class="bg-slate-800/80 hover:bg-slate-800 text-slate-200 p-3 rounded-xl border border-slate-700/50 text-left transition-all hover:border-emerald-500/30 flex items-start gap-3 group"
+                    class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95"
                 >
-                    <span class="text-lg group-hover:scale-110 transition-transform">🚫</span>
-                    <div>
-                        <div class="font-bold text-xs text-slate-200">ลบตัวเลขทั้งหมด</div>
-                        <p class="text-[10px] text-slate-400 mt-0.5">ลบตัวเลขทั้งหมด ทั้งตัวเลขอารบิกและตัวเลขไทยออกจากข้อความ</p>
-                    </div>
+                    <span class="text-sm">🚫</span>
+                    <span class="text-[10px] font-bold">ลบตัวเลข</span>
                 </button>
 
                 <!-- เครื่องมือทดลองลบสระ/วรรณยุกต์ -->
                 <button 
                     onclick="removeVowels()" 
-                    class="bg-slate-800/80 hover:bg-slate-800 text-slate-200 p-3 rounded-xl border border-slate-700/50 text-left transition-all hover:border-emerald-500/30 flex items-start gap-3 group"
+                    class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95"
                 >
-                    <span class="text-lg group-hover:scale-110 transition-transform">🧪</span>
-                    <div>
-                        <div class="font-bold text-xs text-slate-200">ลบสระและวรรณยุกต์</div>
-                        <p class="text-[10px] text-slate-400 mt-0.5">ทดลองลบสระและวรรณยุกต์ภาษาไทยทั้งหมดออก เหลือไว้เพียงพยัญชนะล้วน</p>
-                    </div>
+                    <span class="text-sm">🧪</span>
+                    <span class="text-[10px] font-bold">ลบสระ/วรรณ</span>
                 </button>
 
                 <!-- เครื่องมือจัดระเบียบช่องว่าง -->
                 <button 
                     onclick="squeezeSpaces()" 
-                    class="bg-slate-800/80 hover:bg-slate-800 text-slate-200 p-3 rounded-xl border border-slate-700/50 text-left transition-all hover:border-emerald-500/30 flex items-start gap-3 group"
+                    class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95"
                 >
-                    <span class="text-lg group-hover:scale-110 transition-transform">↔️</span>
-                    <div>
-                        <div class="font-bold text-xs text-slate-200">จัดระเบียบช่องว่าง</div>
-                        <p class="text-[10px] text-slate-400 mt-0.5">ลดช่องว่างที่ซ้ำซ้อนให้เหลือเพียงช่องเดียว และตัดช่องว่างที่หัวท้ายข้อความออก</p>
-                    </div>
+                    <span class="text-sm">↔️</span>
+                    <span class="text-[10px] font-bold">จัดช่องว่าง</span>
                 </button>
 
                 <!-- เครื่องมือแปลงเป็นตัวพิมพ์ใหญ่ -->
                 <button 
                     onclick="convertUpper()" 
-                    class="bg-slate-800/80 hover:bg-slate-800 text-slate-200 p-3 rounded-xl border border-slate-700/50 text-left transition-all hover:border-emerald-500/30 flex items-start gap-3 group"
+                    class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95"
                 >
-                    <span class="text-lg group-hover:scale-110 transition-transform">🅰️</span>
-                    <div>
-                        <div class="font-bold text-xs text-slate-200">แปลงเป็นตัวพิมพ์ใหญ่</div>
-                        <p class="text-[10px] text-slate-400 mt-0.5">ปรับเปลี่ยนตัวอักษรภาษาอังกฤษทั้งหมดในข้อความให้เป็นตัวพิมพ์ใหญ่</p>
-                    </div>
+                    <span class="text-sm">🅰️</span>
+                    <span class="text-[10px] font-bold">พิมพ์ใหญ่</span>
                 </button>
 
                 <!-- เครื่องมือแปลงเป็นตัวพิมพ์เล็ก -->
                 <button 
                     onclick="convertLower()" 
-                    class="bg-slate-800/80 hover:bg-slate-800 text-slate-200 p-3 rounded-xl border border-slate-700/50 text-left transition-all hover:border-emerald-500/30 flex items-start gap-3 group"
+                    class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95"
                 >
-                    <span class="text-lg group-hover:scale-110 transition-transform">ⓐ</span>
-                    <div>
-                        <div class="font-bold text-xs text-slate-200">แปลงเป็นตัวพิมพ์เล็ก</div>
-                        <p class="text-[10px] text-slate-400 mt-0.5">ปรับเปลี่ยนตัวอักษรภาษาอังกฤษทั้งหมดในข้อความให้เป็นตัวพิมพ์เล็ก</p>
-                    </div>
+                    <span class="text-sm">ⓐ</span>
+                    <span class="text-[10px] font-bold">พิมพ์เล็ก</span>
                 </button>
 
             </div>
 
             <!-- ส่วนควบคุมหลักด้านล่าง -->
-            <div class="border-t border-slate-800/60 pt-4 flex flex-col sm:flex-row gap-3">
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-900/60">
                 <!-- เครื่องมือสลับคำแบบสุ่ม -->
                 <button 
                     onclick="shuffleWords()" 
-                    class="bg-amber-950/40 hover:bg-amber-950 text-amber-200 py-3 px-4 rounded-xl border border-amber-900/50 text-xs font-bold transition-all flex-1 flex items-center justify-center gap-2"
+                    class="bg-amber-950/20 hover:bg-amber-950/40 text-amber-200 py-2.5 px-2 rounded-lg border border-amber-900/30 text-[10px] font-bold transition-all flex items-center justify-center gap-1 active:scale-95"
                 >
-                    🌪️ สลับตำแหน่งคำแบบสุ่ม
+                    🌪️ สุ่มสลับคำ
                 </button>
 
                 <!-- ปุ่มคัดลอกข้อความ -->
                 <button 
                     onclick="copyToClipboard()" 
-                    class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-3 px-6 rounded-xl text-xs font-black transition-all flex-1 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-[0.98]"
+                    class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-2.5 px-2 rounded-lg text-[10px] font-black transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/5 active:scale-95"
                 >
-                    📋 คัดลอกข้อความไปใช้งาน
+                    📋 ก๊อปปี้ไปใช้โลด
                 </button>
             </div>
         </section>
 
         <!-- กล่องแจ้งเตือนการคัดลอก (Toast Notification) -->
-        <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 border-2 border-emerald-500 text-emerald-400 px-6 py-3 rounded-full shadow-2xl shadow-emerald-500/10 flex items-center gap-2 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 z-50">
-            <span class="text-lg">🎉</span>
-            <span id="toastMessage" class="text-xs font-bold">คัดลอกข้อความเรียบร้อยแล้วจ้า</span>
+        <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 border-2 border-emerald-500 text-emerald-400 px-4 py-2 rounded-full shadow-2xl shadow-emerald-500/10 flex items-center gap-1.5 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 z-50">
+            <span class="text-sm">🎉</span>
+            <span id="toastMessage" class="text-[10px] font-bold">คัดลอกเรียบร้อยแล้วจ้า</span>
         </div>
 
     </main>
 
     <!-- ส่วนท้ายเว็บแสดงลิขสิทธิ์ของพี่มุ่ยสุดหล่ออย่างเป็นทางการ -->
-    <footer class="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-600 flex flex-col gap-1">
+    <footer class="border-t border-slate-900 py-1.5 text-center text-[8px] text-slate-600 flex flex-col gap-0.5">
         <p class="font-bold text-slate-500">
-            สงวนลิขสิทธิ์ตามพระราชบัญญัติลิขสิทธิ์ทุกประการ © 2026 จัดทำโดย 
+            สงวนลิขสิทธิ์ตาม พรบ.ลิขสิทธิ์ © 2026 โดย 
             <span class="text-emerald-400 font-extrabold hover:text-teal-300 transition-colors">พี่มุ่ยสุดหล่อ</span> 
-            ผู้พัฒนาและออกแบบระบบที่หน้าตาดีที่สุดในจักรวาล
+            ผู้พัฒนาที่หน้าตาดีที่สุดในจักรวาล
         </p>
-        <p class="text-[10px] text-slate-700">คำเตือน: ห้ามทำการลอกเลียนแบบหน้าตาอันหล่อเหลาของพี่มุ่ยโดยเด็ดขาด เพราะเป็นทรัพย์สินทางปัญญาขั้นสูง</p>
     </footer>
 
     <!-- ส่วนเขียนฟังก์ชัน JavaScript -->
@@ -292,7 +272,7 @@
             const cleanedText = originalText.replace(/[^\u0E01-\u0E5B a-zA-Z0-9\s]/g, '');
             editor.value = cleanedText;
             updateMetrics();
-            showToast('ลบสัญลักษณ์พิเศษออกจากข้อความเรียบร้อยแล้วจ้า');
+            showToast('ลบสัญลักษณ์พิเศษเรียบร้อยแล้วจ้า');
         }
 
         // 2. ฟังก์ชันลบตัวเลขทั้งหมด
@@ -301,7 +281,7 @@
             const cleanedText = originalText.replace(/[0-9๐-๙]/g, '');
             editor.value = cleanedText;
             updateMetrics();
-            showToast('ลบตัวเลขทั้งหมดออกจากข้อความเรียบร้อยแล้วจ้า');
+            showToast('ลบตัวเลขทั้งหมดเรียบร้อยแล้วจ้า');
         }
 
         // 3. ฟังก์ชันลบสระและวรรณยุกต์
@@ -320,28 +300,28 @@
             const cleanedText = originalText.replace(/[^\S\r\n]+/g, ' ').trim();
             editor.value = cleanedText;
             updateMetrics();
-            showToast('ปรับขนาดช่องว่างให้อยู่ในระยะที่ถูกต้องแล้วจ้า');
+            showToast('จัดระเบียบช่องว่างเรียบร้อยแล้วจ้า');
         }
 
         // 5. แปลงเป็นตัวพิมพ์ใหญ่
         function convertUpper() {
             editor.value = editor.value.toUpperCase();
             updateMetrics();
-            showToast('แปลงตัวอักษรภาษาอังกฤษเป็นตัวพิมพ์ใหญ่แล้วจ้า');
+            showToast('แปลงเป็นพิมพ์ใหญ่เรียบร้อยแล้วจ้า');
         }
 
         // 6. แปลงเป็นตัวพิมพ์เล็ก
         function convertLower() {
             editor.value = editor.value.toLowerCase();
             updateMetrics();
-            showToast('แปลงตัวอักษรภาษาอังกฤษเป็นตัวพิมพ์เล็กแล้วจ้า');
+            showToast('แปลงเป็นพิมพ์เล็กเรียบร้อยแล้วจ้า');
         }
 
         // 7. สลับตำแหน่งคำแบบสุ่ม
         function shuffleWords() {
             const text = editor.value.trim();
             if (!text) {
-                showToast('กรุณากรอกข้อความก่อนทำการสุ่มสลับคำนะคะ');
+                showToast('กรุณากรอกข้อความก่อนนะคะ');
                 return;
             }
             let words = text.split(/\s+/);
@@ -351,22 +331,22 @@
             }
             editor.value = words.join(' ');
             updateMetrics();
-            showToast('สุ่มสลับตำแหน่งของคำเรียบร้อยแล้วจ้า');
+            showToast('สุ่มสลับคำเรียบร้อยแล้วจ้า');
         }
 
         // 8. ฟังก์ชันเคลียร์หน้าจอ
         function clearText() {
             editor.value = '';
             updateMetrics();
-            showToast('ล้างข้อความทั้งหมดออกจากระบบแล้วจ้า');
+            showToast('ล้างข้อความเรียบร้อยแล้วจ้า');
             editor.focus();
         }
 
-        // ฟังก์ชันคัดลอกข้อความแบบใช้คลิปบอร์ดเสริมความปลอดภัยสำหรับ Iframe
+        // ฟังก์ชันคัดลอกข้อความ
         function copyToClipboard() {
             const text = editor.value;
             if (!text) {
-                showToast('ช่องกรอกข้อความว่างเปล่า ไม่สามารถคัดลอกได้จ้า');
+                showToast('ช่องกรอกข้อความว่างเปล่าจ้า');
                 return;
             }
 
@@ -380,12 +360,12 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    showToast('คัดลอกข้อความลงคลิปบอร์ดเรียบร้อยแล้วจ้า');
+                    showToast('คัดลอกลงคลิปบอร์ดเรียบร้อยแล้วจ้า');
                 } else {
-                    showToast('ระบบเบราว์เซอร์ไม่รองรับ กรุณาคลุมดำคัดลอกด้วยตนเองนะคะ');
+                    showToast('เบราว์เซอร์ไม่รองรับการก๊อปปี้จ้า');
                 }
             } catch (err) {
-                showToast('เกิดข้อผิดพลาดในการคัดลอกข้อความจ้า');
+                showToast('เกิดข้อผิดพลาดในการคัดลอกจ้า');
             }
 
             document.body.removeChild(tempTextArea);
@@ -406,7 +386,7 @@
             toastTimeout = setTimeout(() => {
                 toast.classList.remove('opacity-100', 'translate-y-0');
                 toast.classList.add('opacity-0', 'translate-y-20', 'pointer-events-none');
-            }, 2500);
+            }, 2000);
         }
     </script>
 </body>
