@@ -3,298 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>เครื่องมือนับตัวอักษรและจัดการข้อความ</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Noto Sans Thai -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght=300;400;500;700;900&display=swap" rel="stylesheet">
+    <title>TheMuiZ เครื่องมือจัดการตัวอักษร</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pattaya&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Noto Sans Thai', sans-serif;
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-input: #2a2a2a;
+            --text-main: #e0e0e0;
+            --text-muted: #888888;
+            --accent: #bb86fc;
+            --accent-hover: #9965f4;
+            --btn-bg: #333333;
+            --btn-hover: #444444;
+            --border: #333333;
         }
-        /* ป้องกันการเลื่อนหน้าจอระบบหลัก */
-        html, body {
-            position: fixed;
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .site-title {
+            font-family: 'Pattaya', sans-serif;
+            font-size: 28px;
+            background: linear-gradient(45deg, var(--accent), #ff79c6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .site-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            gap: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .workspace { flex-direction: row; }
+        }
+
+        .text-section {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 10px;
+            min-height: 0;
+        }
+
+        .box-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            position: relative;
+            min-height: 0;
+        }
+
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .btn-group-small button {
+            background: var(--btn-bg);
+            color: var(--text-main);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .btn-undo { background: #f57c00 !important; color: #fff !important; border: 1px solid #e65100 !important; }
+        .btn-undo:hover { background: #ff9800 !important; }
+        .btn-danger { background: #d32f2f !important; color: #fff !important; border: 1px solid #b71c1c !important; }
+        .btn-danger:hover { background: #f44336 !important; }
+        .btn-success { background: #2e7d32 !important; color: #fff !important; border: 1px solid #1b5e20 !important; }
+        .btn-success:hover { background: #4caf50 !important; }
+
+        .textarea-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            min-height: 0;
+        }
+
+        textarea {
             width: 100%;
             height: 100%;
-            overflow: hidden;
+            background: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+            overflow-y: auto;
         }
+
+        .char-count {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            background: rgba(42, 42, 42, 0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .custom-remove-sec {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .custom-remove-sec input {
+            flex: 1;
+            background: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 6px 10px;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .tools-section {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 0.8;
+        }
+
+        .tools-title {
+            font-size: 14px;
+            color: var(--accent);
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .tool-btn {
+            color: #fff;
+            border: 1px solid transparent;
+            padding: 8px 6px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn-c1 { background: #b71c1c; } .btn-c2 { background: #c62828; } .btn-c3 { background: #d84315; } .btn-c4 { background: #ef6c00; }
+        .btn-c5 { background: #f9a825; } .btn-c6 { background: #9e9d24; } .btn-c7 { background: #558b2f; } .btn-c8 { background: #00695c; }
+        .btn-c9 { background: #00838f; } .btn-c10 { background: #0277bd; } .btn-c11 { background: #1565c0; } .btn-c12 { background: #283593; }
+        .btn-c13 { background: #4527a0; } .btn-c14 { background: #6a1b9a; } .btn-c15 { background: #ad1457; } .btn-c16 { background: #4e342e; }
+
+        .footer { text-align: center; margin-top: 5px; font-size: 10px; color: var(--text-muted); }
+        #toast { visibility: hidden; min-width: 200px; background-color: #4caf50; color: #fff; text-align: center; border-radius: 8px; padding: 10px; position: fixed; left: 50%; bottom: 50px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 h-[100dvh] flex flex-col justify-between p-3 selection:bg-emerald-500 selection:text-slate-950">
+<body>
 
-    <!-- ส่วนหัวหน้าเว็บ (Header) ขนาดมินิมอลสุดๆ -->
-    <header class="flex flex-row justify-between items-center pb-2 border-b border-slate-900/80">
-        <div class="flex items-center gap-1.5">
-            <span class="text-base">✍️</span>
-            <div>
-                <h1 class="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-                    เครื่องมือนับตัวอักษรและจัดการข้อความ
-                </h1>
-                <p class="text-[9px] text-slate-500">นับอักษรและจัดการข้อความด่วน</p>
+    <div class="header">
+        <h1 class="site-title">TheMuiZ</h1>
+        <div class="site-subtitle">เครื่องมือจัดการตัวอักษร</div>
+    </div>
+
+    <div class="workspace">
+        <div class="text-section">
+            <div class="box-container">
+                <div class="box-header">
+                    <span>ช่องกรอกข้อมูล</span>
+                    <div class="btn-group-small">
+                        <button onclick="undo()" class="btn-undo">ย้อนกลับ</button>
+                        <button onclick="clearText()" class="btn-danger">ล้างข้อความ</button>
+                    </div>
+                </div>
+                <div class="textarea-wrapper">
+                    <textarea id="input-text"></textarea>
+                    <div id="input-count" class="char-count">0 อักษร</div>
+                </div>
+            </div>
+            <div class="custom-remove-sec">
+                <span>ลบเฉพาะตัว:</span>
+                <input type="text" id="custom-remove-input" placeholder="a,b,ก (คั่นด้วย ,)">
+            </div>
+            <div class="box-container">
+                <div class="box-header">
+                    <span>ช่องแสดงผลลัพธ์</span>
+                    <button onclick="copyOutput()" class="btn-success">คัดลอกข้อความ</button>
+                </div>
+                <div class="textarea-wrapper">
+                    <textarea id="output-text" readonly></textarea>
+                    <div id="output-count" class="char-count">0 อักษร</div>
+                </div>
             </div>
         </div>
-        <span class="text-[8px] bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800 font-medium">
-            v1.4
-        </span>
-    </header>
 
-    <!-- ส่วนเนื้อหาหลัก จัดวางให้พอดีหน้าจอโดยใช้ Flexbox -->
-    <main class="flex-grow flex flex-col gap-2.5 my-2 min-h-0">
-        
-        <!-- แผงแสดงสถิติการตรวจนับ (ย่อขนาดและกระชับพื้นที่) -->
-        <section class="grid grid-cols-2 gap-2">
-            <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-900 flex flex-col justify-center">
-                <span class="text-[10px] text-slate-400 font-bold">รวมสเปซ</span>
-                <div class="flex items-baseline gap-1">
-                    <span id="charCount" class="text-lg font-black text-emerald-400">0</span>
-                    <span class="text-[9px] text-slate-500">ตัว</span>
-                </div>
+        <div class="tools-section">
+            <div class="tools-title">เครื่องมือจัดการ</div>
+            <div class="tools-grid">
+                <button class="tool-btn btn-c1" onclick="applyTool('removeAllSymbols')">ลบสัญลักษณ์ทั้งหมด</button>
+                <button class="tool-btn btn-c2" onclick="applyTool('removeSymbolsKeepBasic')">ลบสัญลักษณ์พื้นฐาน</button>
+                <button class="tool-btn btn-c3" onclick="applyTool('removeNumbers')">ลบตัวเลขทั้งหมด</button>
+                <button class="tool-btn btn-c4" onclick="applyTool('toThaiNumbers')">เปลี่ยนเป็นเลขไทย</button>
+                <button class="tool-btn btn-c5" onclick="applyTool('toArabicNumbers')">เปลี่ยนเป็นอารบิก</button>
+                <button class="tool-btn btn-c6" onclick="applyTool('upperCaseEng')">EN พิมพ์ใหญ่</button>
+                <button class="tool-btn btn-c7" onclick="applyTool('lowerCaseEng')">EN พิมพ์เล็ก</button>
+                <button class="tool-btn btn-c8" onclick="applyTool('capitalizeEng')" style="grid-column: span 2;">EN ขึ้นต้นพิมพ์ใหญ่</button>
+                <button class="tool-btn btn-c9" onclick="applyTool('removeSpaces')">ลบเว้นวรรค</button>
+                <button class="tool-btn btn-c10" onclick="applyTool('removeNewlines')">ลบขึ้นบรรทัดใหม่</button>
+                <button class="tool-btn btn-c11" onclick="applyTool('removeDuplicateSpaces')">ลบเว้นวรรคซ้ำ</button>
+                <button class="tool-btn btn-c12" onclick="applyTool('removeDuplicateLines')">ลบบรรทัดซ้ำ</button>
+                <button class="tool-btn btn-c13" onclick="applyTool('extractNumbers')">ดึงเฉพาะตัวเลข</button>
+                <button class="tool-btn btn-c14" onclick="applyTool('extractThai')">ดึงเฉพาะภาษาไทย</button>
+                <button class="tool-btn btn-c15" onclick="applyTool('extractEnglish')">ดึงเฉพาะภาษาอังกฤษ</button>
+                <button class="tool-btn btn-c16" onclick="applyTool('reverseText')">กลับหลังหันข้อความ</button>
             </div>
-            <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-900 flex flex-col justify-center">
-                <span class="text-[10px] text-slate-400 font-bold">ไม่รวมสเปซ</span>
-                <div class="flex items-baseline gap-1">
-                    <span id="charNoSpaceCount" class="text-lg font-black text-emerald-400">0</span>
-                    <span class="text-[9px] text-slate-500">ตัว</span>
-                </div>
-            </div>
-            <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-900 flex flex-col justify-center">
-                <span class="text-[10px] text-slate-400 font-bold">จำนวนคำ</span>
-                <div class="flex items-baseline gap-1">
-                    <span id="wordCount" class="text-lg font-black text-emerald-400">0</span>
-                    <span class="text-[9px] text-slate-500">คำ</span>
-                </div>
-            </div>
-            <div class="bg-slate-900/60 p-2 rounded-xl border border-slate-900 flex flex-col justify-center">
-                <span class="text-[10px] text-slate-400 font-bold">จำนวนบรรทัด</span>
-                <div class="flex items-baseline gap-1">
-                    <span id="lineCount" class="text-lg font-black text-emerald-400">0</span>
-                    <span class="text-[9px] text-slate-500">แถว</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- พื้นที่ป้อนข้อความ (ยืดหยุ่นตามพื้นที่ว่างที่เหลือ) -->
-        <section class="flex-grow flex flex-col gap-1 min-h-0">
-            <div class="flex justify-between items-center px-1">
-                <label for="editor" class="text-[10px] font-bold text-slate-400 flex items-center gap-1">
-                    <span class="inline-block w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
-                    กรอกหรือวางข้อความของตะเองที่นี่เลยจ้า
-                </label>
-                <span id="saveStatus" class="text-[9px] text-slate-500 transition-opacity duration-300 opacity-0">เซฟชั่วคราวแล้ว</span>
-            </div>
-            <div class="relative flex-grow min-h-0">
-                <textarea 
-                    id="editor" 
-                    class="w-full h-full bg-slate-900 border border-slate-850 focus:border-emerald-500 rounded-xl p-3 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-0 transition-colors resize-none leading-relaxed text-sm"
-                    placeholder="พิมพ์หรือวางข้อความตรงนี้..."
-                ></textarea>
-                <!-- ปุ่มควบคุมการย้อนกลับและเคลียร์ข้อความแบบเล็กกะทัดรัด -->
-                <div class="absolute bottom-2 right-2 flex gap-1.5">
-                    <button 
-                        onclick="undo()" 
-                        class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-1 rounded-lg text-[9px] font-bold border border-slate-700/60 transition-colors flex items-center gap-1 backdrop-blur active:scale-95"
-                    >
-                        ↩️ ย้อนกลับ
-                    </button>
-                    <button 
-                        onclick="clearText()" 
-                        class="bg-red-950/80 hover:bg-red-900 text-red-200 px-2 py-1 rounded-lg text-[9px] font-bold border border-red-800/40 transition-colors flex items-center gap-1 backdrop-blur active:scale-95"
-                    >
-                        🗑️ ล้างทั้งหมด
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- แผงเครื่องมือควบคุมการทำงาน -->
-        <section class="bg-slate-900/40 border border-slate-900 rounded-xl p-2.5 flex flex-col gap-2">
-            
-            <!-- เครื่องมือลบสิ่งที่กำหนดเฉพาะเจาะจง -->
-            <div class="flex flex-col gap-1 border-b border-slate-900/60 pb-2">
-                <label for="specificDeleteInput" class="text-[9px] font-bold text-slate-400">
-                    ❌ สิ่งที่ต้องการลบออก (คั่นด้วย , เช่น #,฿,®)
-                </label>
-                <div class="flex gap-1.5">
-                    <input 
-                        type="text" 
-                        id="specificDeleteInput" 
-                        placeholder="พิมพ์สิ่งที่ต้องการลบ..." 
-                        class="flex-grow bg-slate-950 border border-slate-850 focus:border-emerald-500 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 placeholder:text-slate-700 focus:outline-none focus:ring-0 transition-all"
-                    />
-                    <button 
-                        onclick="removeSpecific()" 
-                        class="bg-red-650 hover:bg-red-600 text-red-100 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-red-800/50 transition-colors flex items-center gap-1 shrink-0 active:scale-95"
-                    >
-                        ลบเฉพาะที่กรอก
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-1.5">
-                <button onclick="removeSymbols()" class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95">
-                    <span class="text-sm">✨</span>
-                    <span class="text-[10px] font-bold">ลบสัญลักษณ์</span>
-                </button>
-                <button onclick="removeNumbers()" class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95">
-                    <span class="text-sm">🚫</span>
-                    <span class="text-[10px] font-bold">ลบตัวเลข</span>
-                </button>
-                <button onclick="removeVowels()" class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95">
-                    <span class="text-sm">🧪</span>
-                    <span class="text-[10px] font-bold">ลบสระ/วรรณ</span>
-                </button>
-                <button onclick="squeezeSpaces()" class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95">
-                    <span class="text-sm">↔️</span>
-                    <span class="text-[10px] font-bold">จัดช่องว่าง</span>
-                </button>
-                <button onclick="convertUpper()" class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95">
-                    <span class="text-sm">🅰️</span>
-                    <span class="text-[10px] font-bold">พิมพ์ใหญ่</span>
-                </button>
-                <button onclick="convertLower()" class="bg-slate-900 hover:bg-slate-850 text-slate-200 py-2 px-1 rounded-lg border border-slate-800 text-center transition-all hover:border-emerald-500/30 flex flex-col items-center justify-center gap-1 active:scale-95">
-                    <span class="text-sm">ⓐ</span>
-                    <span class="text-[10px] font-bold">พิมพ์เล็ก</span>
-                </button>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-900/60">
-                <button onclick="shuffleWords()" class="bg-amber-950/20 hover:bg-amber-950/40 text-amber-200 py-2.5 px-2 rounded-lg border border-amber-900/30 text-[10px] font-bold transition-all flex items-center justify-center gap-1 active:scale-95">
-                    🌪️ สุ่มสลับคำ
-                </button>
-                <button onclick="copyToClipboard()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-2.5 px-2 rounded-lg text-[10px] font-black transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/5 active:scale-95">
-                    📋 ก๊อปปี้ไปใช้โลด
-                </button>
-            </div>
-        </section>
-
-        <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 border-2 border-emerald-500 text-emerald-400 px-4 py-2 rounded-full shadow-2xl shadow-emerald-500/10 flex items-center gap-1.5 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 z-50">
-            <span class="text-sm">🎉</span>
-            <span id="toastMessage" class="text-[10px] font-bold">คัดลอกเรียบร้อยแล้วจ้า</span>
         </div>
-    </main>
+    </div>
 
-    <footer class="border-t border-slate-900 py-1.5 text-center text-[8px] text-slate-600 flex flex-col gap-0.5">
-        <p class="font-bold text-slate-500">
-            สงวนลิขสิทธิ์ตาม พรบ.ลิขสิทธิ์ © 2026 โดย 
-            <span class="text-emerald-400 font-extrabold hover:text-teal-300 transition-colors">พี่มุ่ยสุดหล่อ</span> 
-        </p>
-    </footer>
+    <div class="footer">&copy; สงวนลิขสิทธิ์โดย TheMuiz</div>
+    <div id="toast">คัดลอกข้อความสำเร็จ!</div>
 
     <script>
-        const editor = document.getElementById('editor');
-        const charCount = document.getElementById('charCount');
-        const charNoSpaceCount = document.getElementById('charNoSpaceCount');
-        const wordCount = document.getElementById('wordCount');
-        const lineCount = document.getElementById('lineCount');
-        const saveStatus = document.getElementById('saveStatus');
-        const specificDeleteInput = document.getElementById('specificDeleteInput');
+        const inputArea = document.getElementById('input-text');
+        const outputArea = document.getElementById('output-text');
+        const customRemoveInput = document.getElementById('custom-remove-input');
+        const inputCount = document.getElementById('input-count');
+        const outputCount = document.getElementById('output-count');
+        const toast = document.getElementById('toast');
+        let textHistory = [""];
 
-        let history = [];
-        let lastValue = '';
-
-        function saveState() {
-            const currentText = editor.value;
-            if (history.length === 0 || history[history.length - 1] !== currentText) {
-                history.push(currentText);
-                if (history.length > 50) history.shift();
+        function saveHistory(text) { if (textHistory[textHistory.length-1] !== text) textHistory.push(text); }
+        function undo() { if (textHistory.length > 1) { textHistory.pop(); inputArea.value = textHistory[textHistory.length-1]; processOutput(); } }
+        function clearText() { saveHistory(inputArea.value); inputArea.value = ""; processOutput(); }
+        function copyOutput() { const t = document.createElement('textarea'); t.value = outputArea.value; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); toast.className = "show"; setTimeout(() => toast.className = "", 2000); }
+        
+        function processOutput() {
+            let text = inputArea.value;
+            const removeStr = customRemoveInput.value;
+            if (removeStr) {
+                const chars = removeStr.split(',').map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+                text = text.replace(new RegExp(`(${chars.join('|')})`, 'g'), '');
             }
-            lastValue = currentText;
+            outputArea.value = text;
+            inputCount.innerText = `${inputArea.value.length} อักษร`;
+            outputCount.innerText = `${outputArea.value.length} อักษร`;
         }
 
-        function undo() {
-            if (history.length > 0) {
-                const previousState = history.pop();
-                editor.value = previousState;
-                lastValue = previousState;
-                updateMetrics();
-                showToast('ย้อนกลับการทำงานแล้วจ้า');
-            } else {
-                showToast('ไม่มีขั้นตอนให้ย้อนกลับแล้วจ้า');
+        inputArea.addEventListener('input', () => { saveHistory(inputArea.value); processOutput(); });
+        customRemoveInput.addEventListener('input', processOutput);
+
+        function applyTool(action) {
+            saveHistory(inputArea.value);
+            let text = inputArea.value;
+            switch(action) {
+                case 'removeAllSymbols': text = text.replace(/[^\p{L}\p{N}\s]/gu, ''); break;
+                case 'removeSymbolsKeepBasic': text = text.replace(/[^\p{L}\p{N}\s.,!?"'\-()]/gu, ''); break;
+                case 'removeNumbers': text = text.replace(/[0-9๐-๙]/g, ''); break;
+                case 'toThaiNumbers': text = text.replace(/[0-9]/g, m => ({'0':'๐','1':'๑','2':'๒','3':'๓','4':'๔','5':'๕','6':'๖','7':'๗','8':'๘','9':'๙'})[m]); break;
+                case 'toArabicNumbers': text = text.replace(/[๐-๙]/g, m => ({'๐':'0','๑':'1','๒':'2','๓':'3','๔':'4','๕':'5','๖':'6','๗':'7','๘':'8','๙':'9'})[m]); break;
+                case 'upperCaseEng': text = text.replace(/[a-z]/g, m => m.toUpperCase()); break;
+                case 'lowerCaseEng': text = text.replace(/[A-Z]/g, m => m.toLowerCase()); break;
+                case 'capitalizeEng': text = text.replace(/\b[a-zA-Z]/g, m => m.toUpperCase()); break;
+                case 'removeSpaces': text = text.replace(/[ \t]+/g, ''); break;
+                case 'removeNewlines': text = text.replace(/[\r\n]+/g, ''); break;
+                case 'removeDuplicateSpaces': text = text.replace(/[ \t]{2,}/g, ' '); break;
+                case 'removeDuplicateLines': text = text.replace(/(\r?\n){2,}/g, '\n'); break;
+                case 'extractNumbers': const n = text.match(/[0-9๐-๙]+/g); text = n ? n.join('\n') : ''; break;
+                case 'extractThai': const t = text.match(/[ก-๙]+/g); text = t ? t.join('\n') : ''; break;
+                case 'extractEnglish': const e = text.match(/[a-zA-Z]+/g); text = e ? e.join('\n') : ''; break;
+                case 'reverseText': text = text.split('').reverse().join(''); break;
             }
-        }
-
-        function updateMetrics() {
-            const text = editor.value;
-            charCount.textContent = text.length;
-            const textNoSpace = text.replace(/\s/g, '');
-            charNoSpaceCount.textContent = textNoSpace.length;
-            const trimmedText = text.trim();
-            wordCount.textContent = trimmedText === '' ? 0 : trimmedText.split(/\s+/).length;
-            lineCount.textContent = text === '' ? 0 : text.split('\n').length;
-            localStorage.setItem('github_char_counter_saved_text', text);
-            showSaveIndicator();
-        }
-
-        window.onload = function() {
-            const savedText = localStorage.getItem('github_char_counter_saved_text');
-            if (savedText) {
-                editor.value = savedText;
-                lastValue = savedText;
-                updateMetrics();
-            }
-        };
-
-        let typingTimer;
-        editor.addEventListener('input', () => {
-            updateMetrics();
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => {
-                if (lastValue !== editor.value) {
-                    if (history.length === 0 || history[history.length - 1] !== lastValue) {
-                        history.push(lastValue);
-                        if (history.length > 50) history.shift();
-                    }
-                    lastValue = editor.value;
-                }
-            }, 800);
-        });
-
-        function showSaveIndicator() {
-            saveStatus.classList.remove('opacity-0');
-            saveStatus.classList.add('opacity-100');
-            setTimeout(() => { saveStatus.classList.replace('opacity-100', 'opacity-0'); }, 1000);
-        }
-
-        function removeSpecific() {
-            const originalText = editor.value;
-            const queryValue = specificDeleteInput.value;
-            if (!originalText || !queryValue) return;
-            saveState();
-            const targets = queryValue.split(',');
-            let cleanedText = originalText;
-            targets.forEach(target => {
-                const escapedTarget = target.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-                if (escapedTarget !== '') cleanedText = cleanedText.replace(new RegExp(escapedTarget, 'g'), '');
-            });
-            editor.value = cleanedText;
-            updateMetrics();
-            showToast('ลบเรียบร้อยจ้า');
-        }
-
-        function removeSymbols() { saveState(); editor.value = editor.value.replace(/[^\u0E01-\u0E5B a-zA-Z0-9\s]/g, ''); updateMetrics(); showToast('ลบสัญลักษณ์เรียบร้อยจ้า'); }
-        function removeNumbers() { saveState(); editor.value = editor.value.replace(/[0-9๐-๙]/g, ''); updateMetrics(); showToast('ลบตัวเลขเรียบร้อยจ้า'); }
-        function removeVowels() { saveState(); editor.value = editor.value.replace(/[\u0E30-\u0E3F\u0E47-\u0E4E]/g, ''); updateMetrics(); showToast('ลบสระเรียบร้อยจ้า'); }
-        function squeezeSpaces() { saveState(); editor.value = editor.value.replace(/[^\S\r\n]+/g, ' ').trim(); updateMetrics(); showToast('จัดช่องว่างเรียบร้อยจ้า'); }
-        function convertUpper() { saveState(); editor.value = editor.value.toUpperCase(); updateMetrics(); showToast('พิมพ์ใหญ่เรียบร้อยจ้า'); }
-        function convertLower() { saveState(); editor.value = editor.value.toLowerCase(); updateMetrics(); showToast('พิมพ์เล็กเรียบร้อยจ้า'); }
-        function shuffleWords() { saveState(); let words = editor.value.trim().split(/\s+/); words.sort(() => Math.random() - 0.5); editor.value = words.join(' '); updateMetrics(); showToast('สลับคำเรียบร้อยจ้า'); }
-        function clearText() { saveState(); editor.value = ''; updateMetrics(); showToast('ล้างข้อความเรียบร้อยจ้า'); editor.focus(); }
-
-        function copyToClipboard() {
-            const text = editor.value;
-            if (!text) return;
-            navigator.clipboard.writeText(text).then(() => showToast('คัดลอกเรียบร้อยจ้า'));
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').textContent = message;
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-            toast.classList.add('opacity-100');
-            setTimeout(() => { toast.classList.add('opacity-0', 'pointer-events-none'); toast.classList.remove('opacity-100'); }, 2000);
+            inputArea.value = text;
+            saveHistory(text);
+            processOutput();
         }
     </script>
 </body>
