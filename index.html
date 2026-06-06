@@ -13,6 +13,7 @@
             --text-main: #e0e0e0;
             --text-muted: #888888;
             --accent: #bb86fc;
+            --accent-hover: #9965f4;
             --btn-bg: #333333;
             --btn-hover: #444444;
             --border: #333333;
@@ -294,11 +295,6 @@
         function clearText() { saveHistory(inputArea.value); inputArea.value = ""; processOutput(); }
         function copyOutput() { const t = document.createElement('textarea'); t.value = outputArea.value; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); toast.className = "show"; setTimeout(() => toast.className = "", 2000); }
         
-        function updateCounters() {
-            inputCount.innerText = `${inputArea.value.length} อักษร`;
-            outputCount.innerText = `${outputArea.value.length} อักษร`;
-        }
-
         function processOutput() {
             let text = inputArea.value;
             const removeStr = customRemoveInput.value;
@@ -307,20 +303,22 @@
                 text = text.replace(new RegExp(`(${chars.join('|')})`, 'g'), '');
             }
             outputArea.value = text;
-            updateCounters();
+            inputCount.innerText = `${inputArea.value.length} อักษร`;
+            outputCount.innerText = `${outputArea.value.length} อักษร`;
         }
 
         inputArea.addEventListener('input', () => { saveHistory(inputArea.value); processOutput(); });
         customRemoveInput.addEventListener('input', processOutput);
 
         function applyTool(action) {
-            // ดึงข้อความจากช่องแสดงผลลัพธ์มาใช้งาน เพื่อไม่ให้กระทบช่องกรอกข้อมูล
+            // ดึงข้อความจากช่องผลลัพธ์มาใช้งานแทนช่องกรอกข้อมูล เพื่อไม่ให้กระทบต้นฉบับ
             let text = outputArea.value;
-
+            
             switch(action) {
-                // \p{M} คือตัวพยัญชนะที่เป็น Mark เช่น สระบน-ล่าง และวรรณยุกต์ไทย
+                // เพิ่ม \p{M} เข้าไปเพื่อสงวนสระและวรรณยุกต์ของภาษาไทยไว้
                 case 'removeAllSymbols': text = text.replace(/[^\p{L}\p{M}\p{N}\s]/gu, ''); break;
                 case 'removeSymbolsKeepBasic': text = text.replace(/[^\p{L}\p{M}\p{N}\s.,!?"'\-()]/gu, ''); break;
+                
                 case 'removeNumbers': text = text.replace(/[0-9๐-๙]/g, ''); break;
                 case 'toThaiNumbers': text = text.replace(/[0-9]/g, m => ({'0':'๐','1':'๑','2':'๒','3':'๓','4':'๔','5':'๕','6':'๖','7':'๗','8':'๘','9':'๙'})[m]); break;
                 case 'toArabicNumbers': text = text.replace(/[๐-๙]/g, m => ({'๐':'0','๑':'1','๒':'2','๓':'3','๔':'4','๕':'5','๖':'6','๗':'7','๘':'8','๙':'9'})[m]); break;
@@ -332,14 +330,14 @@
                 case 'removeDuplicateSpaces': text = text.replace(/[ \t]{2,}/g, ' '); break;
                 case 'removeDuplicateLines': text = text.replace(/(\r?\n){2,}/g, '\n'); break;
                 case 'extractNumbers': const n = text.match(/[0-9๐-๙]+/g); text = n ? n.join('\n') : ''; break;
-                case 'extractThai': const t = text.match(/[\p{Thai}]+/gu); text = t ? t.join('\n') : ''; break;
+                case 'extractThai': const t = text.match(/[ก-๙]+/g); text = t ? t.join('\n') : ''; break;
                 case 'extractEnglish': const e = text.match(/[a-zA-Z]+/g); text = e ? e.join('\n') : ''; break;
                 case 'reverseText': text = text.split('').reverse().join(''); break;
             }
             
-            // แสดงผลเฉพาะในช่องผลลัพธ์เท่านั้น
+            // แสดงผลลัพธ์ลงในช่องผลลัพธ์เท่านั้น
             outputArea.value = text;
-            updateCounters();
+            outputCount.innerText = `${outputArea.value.length} อักษร`;
         }
     </script>
 </body>
