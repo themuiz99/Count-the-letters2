@@ -194,7 +194,15 @@
         customRemoveInput.addEventListener('input', processOutput);
 
         function applyTool(action) {
-            let text = outputArea.value;
+            // ตั้งต้นประมวลผลจากค่าที่อยู่ในช่องอินพุตเสมอ เพื่อไม่ให้เกิดการซ้อนทับกันมั่วตอนกดปุ่มอื่น
+            let text = inputArea.value;
+            
+            // นำเงื่อนไข "ลบเฉพาะตัว" มาร่วมคำนวณก่อนส่งไปใช้เครื่องมืออื่นๆ
+            const removeStr = customRemoveInput.value;
+            if (removeStr) {
+                const chars = removeStr.split(',').map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+                text = text.replace(new RegExp(`(${chars.join('|')})`, 'g'), '');
+            }
             
             switch(action) {
                 case 'removeAllSymbols': text = text.replace(/[^\p{L}\p{M}\p{N}\s]/gu, ''); break;
@@ -216,9 +224,9 @@
                 case 'removeLinks': text = text.replace(/(?:https?:\/\/|www\.)[^\s]+/gi, ''); break;
             }
             
-            inputArea.value = text;
-            saveHistory(text);
-            processOutput();
+            // แสดงผลลัพธ์เฉพาะในช่องแสดงผลลัพธ์เท่านั้น (ช่องกรอกข้อมูลเดิมจะไม่เปลี่ยนค่า)
+            outputArea.value = text;
+            outputCount.innerText = `${text.length} อักษร`;
         }
     </script>
 </body>
