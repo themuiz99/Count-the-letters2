@@ -19,12 +19,7 @@
             --border: #333333;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Sarabun', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
 
         body {
             background-color: var(--bg-main);
@@ -36,181 +31,37 @@
             padding: 10px;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 10px;
-            flex-shrink: 0;
-        }
-
-        .site-title {
-            font-family: 'Pattaya', sans-serif;
-            font-size: 28px;
-            background: linear-gradient(45deg, var(--accent), #ff79c6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin: 0;
-            line-height: 1.2;
-        }
-
-        .site-subtitle {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .workspace {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-            gap: 10px;
-        }
-
-        @media (min-width: 768px) {
-            .workspace { flex-direction: row; }
-        }
-
-        .text-section {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            gap: 10px;
-            min-height: 0;
-        }
-
-        .box-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            background: var(--bg-card);
-            border-radius: 8px;
-            padding: 10px;
-            border: 1px solid var(--border);
-            position: relative;
-            min-height: 0;
-        }
-
-        .box-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .btn-group-small button {
-            background: var(--btn-bg);
-            color: var(--text-main);
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .header { text-align: center; margin-bottom: 10px; flex-shrink: 0; }
+        .site-title { font-family: 'Pattaya', sans-serif; font-size: 28px; background: linear-gradient(45deg, var(--accent), #ff79c6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin: 0; line-height: 1.2; }
+        .site-subtitle { font-size: 14px; color: var(--text-muted); }
+        .workspace { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 10px; }
+        @media (min-width: 768px) { .workspace { flex-direction: row; } }
+        .text-section { display: flex; flex-direction: column; flex: 1; gap: 10px; min-height: 0; }
+        .box-container { display: flex; flex-direction: column; flex: 1; background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border); position: relative; min-height: 0; }
+        .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 14px; flex-shrink: 0; }
+        .btn-group-small button { background: var(--btn-bg); color: var(--text-main); border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: 0.2s; }
         
         .btn-undo { background: #f57c00 !important; color: #fff !important; border: 1px solid #e65100 !important; }
-        .btn-undo:hover { background: #ff9800 !important; }
         .btn-danger { background: #d32f2f !important; color: #fff !important; border: 1px solid #b71c1c !important; }
-        .btn-danger:hover { background: #f44336 !important; }
         .btn-success { background: #2e7d32 !important; color: #fff !important; border: 1px solid #1b5e20 !important; }
-        .btn-success:hover { background: #4caf50 !important; }
 
-        .textarea-wrapper {
-            position: relative;
-            flex: 1;
-            display: flex;
-            min-height: 0;
-        }
+        .textarea-wrapper { position: relative; flex: 1; display: flex; min-height: 0; }
+        textarea { width: 100%; height: 100%; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 15px; resize: none; outline: none; overflow-y: auto; }
+        .char-count { position: absolute; bottom: 5px; right: 10px; font-size: 11px; color: var(--text-muted); background: rgba(42, 42, 42, 0.8); padding: 2px 6px; border-radius: 4px; }
 
-        textarea {
-            width: 100%;
-            height: 100%;
-            background: var(--bg-input);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 10px;
-            font-size: 15px;
-            resize: none;
-            outline: none;
-            overflow-y: auto;
-        }
+        .custom-remove-sec { display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; }
+        .custom-remove-sec input { flex: 1; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 6px 10px; border-radius: 4px; outline: none; }
 
-        .char-count {
-            position: absolute;
-            bottom: 5px;
-            right: 10px;
-            font-size: 11px;
-            color: var(--text-muted);
-            background: rgba(42, 42, 42, 0.8);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .custom-remove-sec {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--bg-card);
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-
-        .custom-remove-sec input {
-            flex: 1;
-            background: var(--bg-input);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 6px 10px;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        .tools-section {
-            background: var(--bg-card);
-            border-radius: 8px;
-            padding: 10px;
-            border: 1px solid var(--border);
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex: 0.8;
-        }
-
-        .tools-title {
-            font-size: 14px;
-            color: var(--accent);
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 5px;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-
-        .tool-btn {
-            color: #fff;
-            border: 1px solid transparent;
-            padding: 8px 6px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
+        .tools-section { background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; gap: 8px; flex: 0.8; }
+        .tools-title { font-size: 14px; color: var(--accent); text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .tool-btn { color: #fff; border: 1px solid transparent; padding: 8px 6px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
 
         .btn-c1 { background: #b71c1c; } .btn-c2 { background: #c62828; } .btn-c3 { background: #d84315; } .btn-c4 { background: #ef6c00; }
         .btn-c5 { background: #f9a825; } .btn-c6 { background: #9e9d24; } .btn-c7 { background: #558b2f; } .btn-c8 { background: #00695c; }
         .btn-c9 { background: #00838f; } .btn-c10 { background: #0277bd; } .btn-c11 { background: #1565c0; } .btn-c12 { background: #283593; }
         .btn-c13 { background: #4527a0; } .btn-c14 { background: #6a1b9a; } .btn-c15 { background: #ad1457; } .btn-c16 { background: #4e342e; }
+        .btn-c17 { background: #bf360c; }
 
         .footer { text-align: center; margin-top: 5px; font-size: 10px; color: var(--text-muted); }
         #toast { visibility: hidden; min-width: 200px; background-color: #4caf50; color: #fff; text-align: center; border-radius: 8px; padding: 10px; position: fixed; left: 50%; bottom: 50px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; }
@@ -274,6 +125,7 @@
                 <button class="tool-btn btn-c14" onclick="applyTool('extractThai')">ดึงเฉพาะภาษาไทย</button>
                 <button class="tool-btn btn-c15" onclick="applyTool('extractEnglish')">ดึงเฉพาะภาษาอังกฤษ</button>
                 <button class="tool-btn btn-c16" onclick="applyTool('reverseText')">กลับหลังหันข้อความ</button>
+                <button class="tool-btn btn-c17" onclick="applyTool('removeLinks')">ลบลิงก์ (URL)</button>
             </div>
         </div>
     </div>
@@ -288,12 +140,39 @@
         const inputCount = document.getElementById('input-count');
         const outputCount = document.getElementById('output-count');
         const toast = document.getElementById('toast');
+        
         let textHistory = [""];
 
-        function saveHistory(text) { if (textHistory[textHistory.length-1] !== text) textHistory.push(text); }
-        function undo() { if (textHistory.length > 1) { textHistory.pop(); inputArea.value = textHistory[textHistory.length-1]; processOutput(); } }
-        function clearText() { saveHistory(inputArea.value); inputArea.value = ""; processOutput(); }
-        function copyOutput() { const t = document.createElement('textarea'); t.value = outputArea.value; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); toast.className = "show"; setTimeout(() => toast.className = "", 2000); }
+        function saveHistory(text) { 
+            if (textHistory[textHistory.length - 1] !== text) {
+                textHistory.push(text); 
+            }
+        }
+
+        function undo() { 
+            if (textHistory.length > 1) { 
+                textHistory.pop(); 
+                inputArea.value = textHistory[textHistory.length - 1]; 
+                processOutput(); 
+            } 
+        }
+
+        function clearText() { 
+            textHistory = [""]; 
+            inputArea.value = ""; 
+            processOutput(); 
+        }
+
+        function copyOutput() { 
+            const t = document.createElement('textarea'); 
+            t.value = outputArea.value; 
+            document.body.appendChild(t); 
+            t.select(); 
+            document.execCommand('copy'); 
+            document.body.removeChild(t); 
+            toast.className = "show"; 
+            setTimeout(() => toast.className = "", 2000); 
+        }
         
         function processOutput() {
             let text = inputArea.value;
@@ -307,18 +186,19 @@
             outputCount.innerText = `${outputArea.value.length} อักษร`;
         }
 
-        inputArea.addEventListener('input', () => { saveHistory(inputArea.value); processOutput(); });
+        inputArea.addEventListener('input', () => { 
+            saveHistory(inputArea.value); 
+            processOutput(); 
+        });
+
         customRemoveInput.addEventListener('input', processOutput);
 
         function applyTool(action) {
-            // ดึงข้อความจากช่องผลลัพธ์มาใช้งานแทนช่องกรอกข้อมูล เพื่อไม่ให้กระทบต้นฉบับ
             let text = outputArea.value;
             
             switch(action) {
-                // เพิ่ม \p{M} เข้าไปเพื่อสงวนสระและวรรณยุกต์ของภาษาไทยไว้
                 case 'removeAllSymbols': text = text.replace(/[^\p{L}\p{M}\p{N}\s]/gu, ''); break;
                 case 'removeSymbolsKeepBasic': text = text.replace(/[^\p{L}\p{M}\p{N}\s.,!?"'\-()]/gu, ''); break;
-                
                 case 'removeNumbers': text = text.replace(/[0-9๐-๙]/g, ''); break;
                 case 'toThaiNumbers': text = text.replace(/[0-9]/g, m => ({'0':'๐','1':'๑','2':'๒','3':'๓','4':'๔','5':'๕','6':'๖','7':'๗','8':'๘','9':'๙'})[m]); break;
                 case 'toArabicNumbers': text = text.replace(/[๐-๙]/g, m => ({'๐':'0','๑':'1','๒':'2','๓':'3','๔':'4','๕':'5','๖':'6','๗':'7','๘':'8','๙':'9'})[m]); break;
@@ -333,11 +213,12 @@
                 case 'extractThai': const t = text.match(/[ก-๙]+/g); text = t ? t.join('\n') : ''; break;
                 case 'extractEnglish': const e = text.match(/[a-zA-Z]+/g); text = e ? e.join('\n') : ''; break;
                 case 'reverseText': text = text.split('').reverse().join(''); break;
+                case 'removeLinks': text = text.replace(/(?:https?:\/\/|www\.)[^\s]+/gi, ''); break;
             }
             
-            // แสดงผลลัพธ์ลงในช่องผลลัพธ์เท่านั้น
-            outputArea.value = text;
-            outputCount.innerText = `${outputArea.value.length} อักษร`;
+            inputArea.value = text;
+            saveHistory(text);
+            processOutput();
         }
     </script>
 </body>
