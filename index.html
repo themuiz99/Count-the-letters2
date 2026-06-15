@@ -61,7 +61,7 @@
         .btn-c5 { background: #f9a825; } .btn-c6 { background: #9e9d24; } .btn-c7 { background: #558b2f; } .btn-c8 { background: #00695c; }
         .btn-c9 { background: #00838f; } .btn-c10 { background: #0277bd; } .btn-c11 { background: #1565c0; } .btn-c12 { background: #283593; }
         .btn-c13 { background: #4527a0; } .btn-c14 { background: #6a1b9a; } .btn-c15 { background: #ad1457; } .btn-c16 { background: #4e342e; }
-        .btn-c17 { background: #bf360c; }
+        .btn-c17 { background: #bf360c; } .btn-c18 { background: #7b1fa2; }
 
         .footer { text-align: center; margin-top: 5px; font-size: 10px; color: var(--text-muted); }
         #toast { visibility: hidden; min-width: 200px; background-color: #4caf50; color: #fff; text-align: center; border-radius: 8px; padding: 10px; position: fixed; left: 50%; bottom: 50px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; }
@@ -112,6 +112,7 @@
                 <button class="tool-btn btn-c1" onclick="applyTool('removeAllSymbols')">ลบสัญลักษณ์ทั้งหมด</button>
                 <button class="tool-btn btn-c2" onclick="applyTool('removeSymbolsKeepBasic')">ลบสัญลักษณ์พื้นฐาน</button>
                 <button class="tool-btn btn-c3" onclick="applyTool('removeNumbers')">ลบตัวเลขทั้งหมด</button>
+                <button class="tool-btn btn-c18" onclick="applyTool('removeEnglish')">ลบภาษาอังกฤษ</button>
                 <button class="tool-btn btn-c4" onclick="applyTool('toThaiNumbers')">เปลี่ยนเป็นเลขไทย</button>
                 <button class="tool-btn btn-c5" onclick="applyTool('toArabicNumbers')">เปลี่ยนเป็นอารบิก</button>
                 <button class="tool-btn btn-c6" onclick="applyTool('upperCaseEng')">EN พิมพ์ใหญ่</button>
@@ -208,6 +209,7 @@
                 case 'removeAllSymbols': text = text.replace(/[^\p{L}\p{M}\p{N}\s]/gu, ''); break;
                 case 'removeSymbolsKeepBasic': text = text.replace(/[^\p{L}\p{M}\p{N}\s.,!?"'\-()]/gu, ''); break;
                 case 'removeNumbers': text = text.replace(/[0-9๐-๙]/g, ''); break;
+                case 'removeEnglish': text = text.replace(/[a-zA-Z]/g, ''); break;
                 case 'toThaiNumbers': text = text.replace(/[0-9]/g, m => ({'0':'๐','1':'๑','2':'๒','3':'๓','4':'๔','5':'๕','6':'๖','7':'๗','8':'๘','9':'๙'})[m]); break;
                 case 'toArabicNumbers': text = text.replace(/[๐-๙]/g, m => ({'๐':'0','๑':'1','๒':'2','๓':'3','๔':'4','๕':'5','๖':'6','๗':'7','๘':'8','๙':'9'})[m]); break;
                 case 'upperCaseEng': text = text.replace(/[a-z]/g, m => m.toUpperCase()); break;
