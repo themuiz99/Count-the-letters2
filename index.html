@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TheMuiZ เครื่องมือจัดการตัวอักษร</title>
     <link href="https://fonts.googleapis.com/css2?family=Pattaya&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- เพิ่มเฉพาะส่วนสำหรับสร้าง PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         :root {
             --bg-main: #121212;
@@ -67,6 +71,42 @@
         .footer { text-align: center; margin-top: 2px; font-size: 9px; color: var(--text-muted); }
         #toast { visibility: hidden; min-width: 150px; background-color: #4caf50; color: #fff; text-align: center; border-radius: 8px; padding: 8px; position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 12px; }
         #toast.show { visibility: visible; opacity: 1; }
+
+        /* ============================= */
+        /* เพิ่มเฉพาะส่วนปุ่มบันทึกไฟล์ */
+        /* ============================= */
+
+        .save-document-section {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .save-document-section select {
+            background: var(--btn-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 3px 5px;
+            font-size: 11px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn-save-document {
+            background: #1565c0 !important;
+            color: #fff !important;
+            border: 1px solid #0d47a1 !important;
+            padding: 3px 7px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-save-document:hover {
+            background: #1976d2 !important;
+        }
     </style>
 </head>
 <body>
@@ -91,15 +131,36 @@
                     <div id="input-count" class="char-count">0 อักษร</div>
                 </div>
             </div>
+
             <div class="custom-remove-sec">
                 <span>ลบเฉพาะตัว:</span>
                 <input type="text" id="custom-remove-input" placeholder="a,b,ก (คั่นด้วย ,)">
             </div>
+
             <div class="box-container">
                 <div class="box-header">
                     <span>ช่องแสดงผลลัพธ์</span>
-                    <button onclick="copyOutput()" class="btn-success">คัดลอกข้อความ</button>
+
+                    <div class="save-document-section">
+                        <button onclick="copyOutput()" class="btn-success">คัดลอกข้อความ</button>
+
+                        <!-- ปุ่มและตัวเลือกไฟล์ที่เพิ่มเข้ามา -->
+                        <select id="document-format" title="เลือกรูปแบบไฟล์">
+                            <option value="txt">TXT</option>
+                            <option value="md">MD</option>
+                            <option value="csv">CSV</option>
+                            <option value="html">HTML</option>
+                            <option value="json">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="pdf">PDF</option>
+                        </select>
+
+                        <button onclick="saveDocument()" class="btn-save-document">
+                            บันทึกไฟล์
+                        </button>
+                    </div>
                 </div>
+
                 <div class="textarea-wrapper">
                     <textarea id="output-text" readonly></textarea>
                     <div id="output-count" class="char-count">0 อักษร</div>
@@ -192,7 +253,7 @@
             outputArea.value = text;
             inputCount.innerText = `${inputArea.value.length} อักษร`;
             outputCount.innerText = `${outputArea.value.length} อักษร`;
-            saveState(text); // บันทึกสถานะการพิมพ์
+            saveState(text);
         }
 
         inputArea.addEventListener('input', () => { 
@@ -233,7 +294,149 @@
             
             outputArea.value = text;
             outputCount.innerText = `${text.length} อักษร`;
-            saveState(text); // บันทึกผลลัพธ์หลังกดเครื่องมือ
+            saveState(text);
+        }
+
+
+        /* ====================================================== */
+        /* เพิ่มเฉพาะระบบบันทึกข้อความใน output เป็นไฟล์เอกสาร */
+        /* ====================================================== */
+
+        function saveDocument() {
+            const text = outputArea.value;
+            const format = document.getElementById('document-format').value;
+
+            if (!text.trim()) {
+                alert('ไม่มีข้อความในช่องแสดงผลลัพธ์สำหรับบันทึก');
+                return;
+            }
+
+            const fileName = `TheMuiZ_ข้อความ.${format}`;
+
+            // TXT
+            if (format === 'txt') {
+                downloadBlob(text, 'text/plain;charset=utf-8', fileName);
+            }
+
+            // Markdown
+            else if (format === 'md') {
+                downloadBlob(text, 'text/markdown;charset=utf-8', fileName);
+            }
+
+            // CSV
+            else if (format === 'csv') {
+                downloadBlob('\uFEFF' + text, 'text/csv;charset=utf-8', fileName);
+            }
+
+            // HTML
+            else if (format === 'html') {
+                const htmlContent = `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>TheMuiZ</title>
+</head>
+<body>
+<pre>${escapeHtml(text)}</pre>
+</body>
+</html>`;
+
+                downloadBlob(htmlContent, 'text/html;charset=utf-8', fileName);
+            }
+
+            // JSON
+            else if (format === 'json') {
+                const jsonContent = JSON.stringify({
+                    source: 'TheMuiZ',
+                    content: text
+                }, null, 2);
+
+                downloadBlob(jsonContent, 'application/json;charset=utf-8', fileName);
+            }
+
+            // XML
+            else if (format === 'xml') {
+                const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <source>TheMuiZ</source>
+    <content><![CDATA[
+${text}
+    ]]></content>
+</document>`;
+
+                downloadBlob(xmlContent, 'application/xml;charset=utf-8', fileName);
+            }
+
+            // PDF
+            else if (format === 'pdf') {
+                saveAsPDF(text);
+            }
+        }
+
+        function downloadBlob(content, type, fileName) {
+            const blob = new Blob([content], { type: type });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+
+            showSaveToast();
+        }
+
+        function saveAsPDF(text) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 15;
+            const maxWidth = pageWidth - (margin * 2);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+
+            const lines = doc.splitTextToSize(text, maxWidth);
+
+            let y = 20;
+            const lineHeight = 7;
+
+            lines.forEach(line => {
+                if (y > 280) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.text(line, margin, y);
+                y += lineHeight;
+            });
+
+            doc.save('TheMuiZ_ข้อความ.pdf');
+
+            showSaveToast();
+        }
+
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function showSaveToast() {
+            toast.innerText = 'บันทึกไฟล์สำเร็จ!';
+            toast.className = "show";
+
+            setTimeout(() => {
+                toast.className = "";
+                toast.innerText = "คัดลอกข้อความสำเร็จ!";
+            }, 2000);
         }
     </script>
 </body>
