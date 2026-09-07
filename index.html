@@ -961,7 +961,7 @@
 
 
         /* ====================================================== */
-        /* ระบบบันทึกไฟล์ (ปรับแก้ใหม่ ใช้หน้าต่าง Prompt รับชื่อไฟล์) */
+        /* ระบบบันทึกไฟล์ (เอาหน้าต่าง Prompt ออก เซฟอัตโนมัติทันที) */
         /* ====================================================== */
 
         function saveDocument() {
@@ -983,18 +983,8 @@
                 return;
             }
 
-            let customName = prompt(
-                "กรุณาตั้งชื่อไฟล์ (ไม่ต้องใส่จุดและนามสกุล):",
-                "TheMuiZ_ข้อความ"
-            );
-
-            // หากพี่มุ่ยกดยกเลิก หรือปล่อยว่างไว้ ให้ยกเลิกการบันทึกไฟล์
-            if (customName === null || customName.trim() === "") {
-                return; 
-            }
-
-            const fileName =
-                `${customName.trim()}.${format}`;
+            const defaultName = "TheMuiZ_Document";
+            const fileName = `${defaultName}.${format}`;
 
 
             if (format === 'txt') {
@@ -1037,7 +1027,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>${customName.trim()}</title>
+<title>${defaultName}</title>
 </head>
 <body>
 <pre>${escapeHtml(text)}</pre>
@@ -1058,7 +1048,7 @@
                     JSON.stringify(
                         {
                             source: 'TheMuiZ',
-                            title: customName.trim(),
+                            title: defaultName,
                             content: text
                         },
                         null,
@@ -1079,7 +1069,7 @@
 `<?xml version="1.0" encoding="UTF-8"?>
 <document>
     <source>TheMuiZ</source>
-    <title>${customName.trim()}</title>
+    <title>${defaultName}</title>
     <content><![CDATA[
 ${text}
     ]]></content>
@@ -1095,7 +1085,6 @@ ${text}
 
             else if (format === 'pdf') {
 
-                // ส่งชื่อที่กรอกเข้าไปใช้กับฟังก์ชันสร้าง PDF ด้วย
                 saveAsPDF(text, fileName);
             }
         }
@@ -1200,7 +1189,6 @@ ${text}
             );
 
             
-            // บันทึก PDF ด้วยชื่อที่พี่มุ่ยกรอก
             doc.save(
                 fileName
             );
