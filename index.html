@@ -6,7 +6,7 @@
     <title>TheMuiZ เครื่องมือจัดการตัวอักษร</title>
     <link href="https://fonts.googleapis.com/css2?family=Pattaya&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
 
-    <!-- เพิ่มเฉพาะส่วนสำหรับสร้าง PDF (พีดีเอฟ) -->
+    <!-- เพิ่มเฉพาะส่วนสำหรับสร้าง PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
@@ -369,13 +369,13 @@
                             id="document-format"
                             title="เลือกรูปแบบไฟล์"
                         >
-                            <option value="txt">TXT (ทีเอ็กซ์ที)</option>
-                            <option value="md">MD (มาร์ดาวน์)</option>
-                            <option value="csv">CSV (ซีเอสวี)</option>
-                            <option value="html">HTML (เอชทีเอ็มแอล)</option>
-                            <option value="json">JSON (เจซอน)</option>
-                            <option value="xml">XML (เอ็กซ์เอ็มแอล)</option>
-                            <option value="pdf">PDF (พีดีเอฟ)</option>
+                            <option value="txt">TXT</option>
+                            <option value="md">MD</option>
+                            <option value="csv">CSV</option>
+                            <option value="html">HTML</option>
+                            <option value="json">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="pdf">PDF</option>
                         </select>
 
                         <button
@@ -458,14 +458,14 @@
                     class="tool-btn btn-c6"
                     onclick="applyTool('upperCaseEng')"
                 >
-                    EN (อังกฤษ) พิมพ์ใหญ่
+                    EN พิมพ์ใหญ่
                 </button>
 
                 <button
                     class="tool-btn btn-c7"
                     onclick="applyTool('lowerCaseEng')"
                 >
-                    EN (อังกฤษ) พิมพ์เล็ก
+                    EN พิมพ์เล็ก
                 </button>
 
                 <button
@@ -473,7 +473,7 @@
                     onclick="applyTool('capitalizeEng')"
                     style="grid-column: span 2;"
                 >
-                    EN (อังกฤษ) ขึ้นต้นพิมพ์ใหญ่
+                    EN ขึ้นต้นพิมพ์ใหญ่
                 </button>
 
                 <button
@@ -536,14 +536,14 @@
                     class="tool-btn btn-c17"
                     onclick="applyTool('removeLinks')"
                 >
-                    ลบลิงก์ (URL - ยูอาร์แอล)
+                    ลบลิงก์ (URL)
                 </button>
 
                 <button
                     class="tool-btn btn-c19"
                     onclick="applyTool('removeAIReferences')"
                 >
-                    ลบแหล่งอ้างอิง AI (เอไอ)
+                    ลบแหล่งอ้างอิง AI
                 </button>
 
             </div>
@@ -551,7 +551,7 @@
     </div>
 
     <div class="footer">
-        &copy; สงวนลิขสิทธิ์โดย TheMuiz (เดอะมุ่ยส์)
+        &copy; สงวนลิขสิทธิ์โดย TheMuiz
     </div>
 
     <div id="toast">
@@ -579,7 +579,7 @@
             document.getElementById('toast');
 
 
-        // เก็บประวัติผลลัพธ์เพื่อรองรับการ Undo (เลิกทำ) ทุกย่างก้าว
+        // เก็บประวัติผลลัพธ์เพื่อรองรับการ Undo ทุกย่างก้าว
         let outputHistory = [""];
 
 
@@ -961,14 +961,8 @@
 
 
         /* ====================================================== */
-        /* ระบบตรวจสอบสภาพแวดล้อมและบันทึกไฟล์ (แยก Browser vs Application) */
+        /* ระบบบันทึกไฟล์ (ปรับแก้ใหม่ ใช้หน้าต่าง Prompt รับชื่อไฟล์) */
         /* ====================================================== */
-
-        // ฟังก์ชันตรวจสอบว่าเปิดผ่าน Application (แอปพลิเคชัน) / WebView (เว็บวิว) หรือไม่
-        function isWebView() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            return /(wv|iP(hone|ad|od).*AppleWebKit(?!.*Safari))/i.test(userAgent) || !/Chrome|Safari/i.test(userAgent);
-        }
 
         function saveDocument() {
 
@@ -980,7 +974,6 @@
                     'document-format'
                 ).value;
 
-
             if (!text.trim()) {
 
                 alert(
@@ -990,21 +983,18 @@
                 return;
             }
 
+            let customName = prompt(
+                "กรุณาตั้งชื่อไฟล์ (ไม่ต้องใส่จุดและนามสกุล):",
+                "TheMuiZ_ข้อความ"
+            );
 
-            let fileName = `TheMuiZ_ข้อความ.${format}`;
-
-            // หากเปิดผ่าน Application (แอปพลิเคชัน) ให้เด้งหน้าต่างตั้งชื่อไฟล์ขึ้นมา
-            if (isWebView()) {
-                const userInput = prompt('กรุณากรอกชื่อไฟล์ที่ต้องการบันทึก:', '');
-                if (userInput === null) {
-                    return; // ยกเลิกหากกด Cancel (ยกเลิก)
-                }
-                const trimmedInput = userInput.trim();
-                if (trimmedInput !== '') {
-                    // จัดการเติม นามสกุลไฟล์ ให้ถูกต้องตามที่เลือก หากผู้พิมพ์ไม่ได้ใส่
-                    fileName = trimmedInput.toLowerCase().endsWith('.' + format) ? trimmedInput : `${trimmedInput}.${format}`;
-                }
+            // หากพี่มุ่ยกดยกเลิก หรือปล่อยว่างไว้ ให้ยกเลิกการบันทึกไฟล์
+            if (customName === null || customName.trim() === "") {
+                return; 
             }
+
+            const fileName =
+                `${customName.trim()}.${format}`;
 
 
             if (format === 'txt') {
@@ -1047,7 +1037,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>TheMuiZ</title>
+<title>${customName.trim()}</title>
 </head>
 <body>
 <pre>${escapeHtml(text)}</pre>
@@ -1068,6 +1058,7 @@
                     JSON.stringify(
                         {
                             source: 'TheMuiZ',
+                            title: customName.trim(),
                             content: text
                         },
                         null,
@@ -1088,6 +1079,7 @@
 `<?xml version="1.0" encoding="UTF-8"?>
 <document>
     <source>TheMuiZ</source>
+    <title>${customName.trim()}</title>
     <content><![CDATA[
 ${text}
     ]]></content>
@@ -1103,6 +1095,7 @@ ${text}
 
             else if (format === 'pdf') {
 
+                // ส่งชื่อที่กรอกเข้าไปใช้กับฟังก์ชันสร้าง PDF ด้วย
                 saveAsPDF(text, fileName);
             }
         }
@@ -1113,7 +1106,7 @@ ${text}
             type,
             fileName
         ) {
-            // ใช้ Blob (บล็อบ) และ URL.createObjectURL เสมอเพื่อให้แอป/เบราว์เซอร์รับชื่อไฟล์ที่กำหนดได้ถูกต้อง
+            
             const blob =
                 new Blob(
                     [content],
@@ -1138,13 +1131,15 @@ ${text}
 
             document.body.removeChild(link);
 
-            URL.revokeObjectURL(url);
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 100);
 
             showSaveToast();
         }
 
 
-        function saveAsPDF(text, fileName = 'TheMuiZ_ข้อความ.pdf') {
+        function saveAsPDF(text, fileName) {
 
             const {
                 jsPDF
@@ -1204,8 +1199,8 @@ ${text}
                 }
             );
 
-
-            // ใช้ doc.save พร้อมชื่อไฟล์ที่ผู้ใช้กรอกเข้ามาโดยตรง
+            
+            // บันทึก PDF ด้วยชื่อที่พี่มุ่ยกรอก
             doc.save(
                 fileName
             );
