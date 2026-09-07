@@ -6,7 +6,7 @@
     <title>TheMuiZ เครื่องมือจัดการตัวอักษร</title>
     <link href="https://fonts.googleapis.com/css2?family=Pattaya&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
 
-    <!-- เพิ่มเฉพาะส่วนสำหรับสร้าง PDF -->
+    <!-- เพิ่มเฉพาะส่วนสำหรับสร้าง PDF (พีดีเอฟ) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
@@ -369,13 +369,13 @@
                             id="document-format"
                             title="เลือกรูปแบบไฟล์"
                         >
-                            <option value="txt">TXT</option>
-                            <option value="md">MD</option>
-                            <option value="csv">CSV</option>
-                            <option value="html">HTML</option>
-                            <option value="json">JSON</option>
-                            <option value="xml">XML</option>
-                            <option value="pdf">PDF</option>
+                            <option value="txt">TXT (ทีเอ็กซ์ที)</option>
+                            <option value="md">MD (มาร์ดาวน์)</option>
+                            <option value="csv">CSV (ซีเอสวี)</option>
+                            <option value="html">HTML (เอชทีเอ็มแอล)</option>
+                            <option value="json">JSON (เจซอน)</option>
+                            <option value="xml">XML (เอ็กซ์เอ็มแอล)</option>
+                            <option value="pdf">PDF (พีดีเอฟ)</option>
                         </select>
 
                         <button
@@ -458,14 +458,14 @@
                     class="tool-btn btn-c6"
                     onclick="applyTool('upperCaseEng')"
                 >
-                    EN พิมพ์ใหญ่
+                    EN (อังกฤษ) พิมพ์ใหญ่
                 </button>
 
                 <button
                     class="tool-btn btn-c7"
                     onclick="applyTool('lowerCaseEng')"
                 >
-                    EN พิมพ์เล็ก
+                    EN (อังกฤษ) พิมพ์เล็ก
                 </button>
 
                 <button
@@ -473,7 +473,7 @@
                     onclick="applyTool('capitalizeEng')"
                     style="grid-column: span 2;"
                 >
-                    EN ขึ้นต้นพิมพ์ใหญ่
+                    EN (อังกฤษ) ขึ้นต้นพิมพ์ใหญ่
                 </button>
 
                 <button
@@ -536,14 +536,14 @@
                     class="tool-btn btn-c17"
                     onclick="applyTool('removeLinks')"
                 >
-                    ลบลิงก์ (URL)
+                    ลบลิงก์ (URL - ยูอาร์แอล)
                 </button>
 
                 <button
                     class="tool-btn btn-c19"
                     onclick="applyTool('removeAIReferences')"
                 >
-                    ลบแหล่งอ้างอิง AI
+                    ลบแหล่งอ้างอิง AI (เอไอ)
                 </button>
 
             </div>
@@ -551,7 +551,7 @@
     </div>
 
     <div class="footer">
-        &copy; สงวนลิขสิทธิ์โดย TheMuiz
+        &copy; สงวนลิขสิทธิ์โดย TheMuiz (เดอะมุ่ยส์)
     </div>
 
     <div id="toast">
@@ -579,7 +579,7 @@
             document.getElementById('toast');
 
 
-        // เก็บประวัติผลลัพธ์เพื่อรองรับการ Undo ทุกย่างก้าว
+        // เก็บประวัติผลลัพธ์เพื่อรองรับการ Undo (เลิกทำ) ทุกย่างก้าว
         let outputHistory = [""];
 
 
@@ -993,15 +993,16 @@
 
             let fileName = `TheMuiZ_ข้อความ.${format}`;
 
-            // หากดาวน์โหลดผ่าน Application (แอปพลิเคชัน) ให้เด้งกล่องตั้งชื่อไฟล์โดยให้ช่องกรอกข้อมูลว่างเปล่า
+            // หากเปิดผ่าน Application (แอปพลิเคชัน) ให้เด้งหน้าต่างตั้งชื่อไฟล์ขึ้นมา
             if (isWebView()) {
                 const userInput = prompt('กรุณากรอกชื่อไฟล์ที่ต้องการบันทึก:', '');
                 if (userInput === null) {
-                    return; // ยกเลิกการดาวน์โหลดหากกด Cancel (ยกเลิก)
+                    return; // ยกเลิกหากกด Cancel (ยกเลิก)
                 }
                 const trimmedInput = userInput.trim();
                 if (trimmedInput !== '') {
-                    fileName = trimmedInput.endsWith('.' + format) ? trimmedInput : `${trimmedInput}.${format}`;
+                    // จัดการเติม นามสกุลไฟล์ ให้ถูกต้องตามที่เลือก หากผู้พิมพ์ไม่ได้ใส่
+                    fileName = trimmedInput.toLowerCase().endsWith('.' + format) ? trimmedInput : `${trimmedInput}.${format}`;
                 }
             }
 
@@ -1112,53 +1113,34 @@ ${text}
             type,
             fileName
         ) {
-            if (isWebView()) {
-                // สำหรับ Application (แอปพลิเคชัน) / WebView (เว็บวิว): ใช้ Data URI (ดาต้า URL) เพื่อให้แอปโหลดไฟล์ได้
-                try {
-                    const dataUri = 'data:' + type + ',' + encodeURIComponent(content);
-                    const link = document.createElement('a');
-                    link.href = dataUri;
-                    link.download = fileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    showSaveToast();
-                } catch (e) {
-                    // กรณีแอปบล็อกเด็ดขาด ให้คัดลอกลง Clipboard (คลิปบอร์ดสำหรับพักข้อมูล) สำรองแทน
-                    navigator.clipboard.writeText(content).then(() => {
-                        alert('แอปไม่อนุญาตให้ดาวน์โหลดไฟล์โดยตรง มะลิคัดลอกข้อความลง Clipboard (คลิปบอร์ด) ให้แทนแล้วค่ะ');
-                    });
-                }
-            } else {
-                // สำหรับ Browser (โปรแกรมท่องเว็บ) ปกติ: ใช้ Blob (ข้อมูลจำลองแบบบล็อบ) ตามโค้ดเดิมเป๊ะๆ
-                const blob =
-                    new Blob(
-                        [content],
-                        { type: type }
-                    );
+            // ใช้ Blob (บล็อบ) และ URL.createObjectURL เสมอเพื่อให้แอป/เบราว์เซอร์รับชื่อไฟล์ที่กำหนดได้ถูกต้อง
+            const blob =
+                new Blob(
+                    [content],
+                    { type: type }
+                );
 
-                const url =
-                    URL.createObjectURL(blob);
+            const url =
+                URL.createObjectURL(blob);
 
 
-                const link =
-                    document.createElement('a');
+            const link =
+                document.createElement('a');
 
-                link.href = url;
+            link.href = url;
 
-                link.download =
-                    fileName;
+            link.download =
+                fileName;
 
-                document.body.appendChild(link);
+            document.body.appendChild(link);
 
-                link.click();
+            link.click();
 
-                document.body.removeChild(link);
+            document.body.removeChild(link);
 
-                URL.revokeObjectURL(url);
+            URL.revokeObjectURL(url);
 
-                showSaveToast();
-            }
+            showSaveToast();
         }
 
 
@@ -1223,29 +1205,12 @@ ${text}
             );
 
 
-            if (isWebView()) {
-                // สำหรับ Application (แอปพลิเคชัน) / WebView (เว็บวิว): แปลง PDF เป็น Data URI (ดาต้า URL)
-                try {
-                    const pdfDataUri = doc.output('datauristring');
-                    const link = document.createElement('a');
-                    link.href = pdfDataUri;
-                    link.download = fileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    showSaveToast();
-                } catch (e) {
-                    doc.save(fileName);
-                    showSaveToast();
-                }
-            } else {
-                // สำหรับ Browser (โปรแกรมท่องเว็บ) ปกติ: ใช้คำสั่งเดิมตามปกติ
-                doc.save(
-                    fileName
-                );
+            // ใช้ doc.save พร้อมชื่อไฟล์ที่ผู้ใช้กรอกเข้ามาโดยตรง
+            doc.save(
+                fileName
+            );
 
-                showSaveToast();
-            }
+            showSaveToast();
         }
 
 
