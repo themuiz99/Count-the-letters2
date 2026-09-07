@@ -991,8 +991,19 @@
             }
 
 
-            const fileName =
-                `TheMuiZ_ข้อความ.${format}`;
+            let fileName = `TheMuiZ_ข้อความ.${format}`;
+
+            // หากดาวน์โหลดผ่าน Application (แอปพลิเคชัน) ให้เด้งกล่องตั้งชื่อไฟล์โดยให้ช่องกรอกข้อมูลว่างเปล่า
+            if (isWebView()) {
+                const userInput = prompt('กรุณากรอกชื่อไฟล์ที่ต้องการบันทึก:', '');
+                if (userInput === null) {
+                    return; // ยกเลิกการดาวน์โหลดหากกด Cancel (ยกเลิก)
+                }
+                const trimmedInput = userInput.trim();
+                if (trimmedInput !== '') {
+                    fileName = trimmedInput.endsWith('.' + format) ? trimmedInput : `${trimmedInput}.${format}`;
+                }
+            }
 
 
             if (format === 'txt') {
@@ -1091,7 +1102,7 @@ ${text}
 
             else if (format === 'pdf') {
 
-                saveAsPDF(text);
+                saveAsPDF(text, fileName);
             }
         }
 
@@ -1151,7 +1162,7 @@ ${text}
         }
 
 
-        function saveAsPDF(text) {
+        function saveAsPDF(text, fileName = 'TheMuiZ_ข้อความ.pdf') {
 
             const {
                 jsPDF
@@ -1218,19 +1229,19 @@ ${text}
                     const pdfDataUri = doc.output('datauristring');
                     const link = document.createElement('a');
                     link.href = pdfDataUri;
-                    link.download = 'TheMuiZ_ข้อความ.pdf';
+                    link.download = fileName;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
                     showSaveToast();
                 } catch (e) {
-                    doc.save('TheMuiZ_ข้อความ.pdf');
+                    doc.save(fileName);
                     showSaveToast();
                 }
             } else {
                 // สำหรับ Browser (โปรแกรมท่องเว็บ) ปกติ: ใช้คำสั่งเดิมตามปกติ
                 doc.save(
-                    'TheMuiZ_ข้อความ.pdf'
+                    fileName
                 );
 
                 showSaveToast();
