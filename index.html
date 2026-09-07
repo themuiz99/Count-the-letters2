@@ -939,23 +939,6 @@
                     break;
 
 
-                /*
-                 * ==================================================
-                 * แก้ไขการลบแหล่งอ้างอิง AI
-                 *
-                 * จะลบทุกอย่างที่อยู่ระหว่าง [[ และ ]]
-                 *
-                 * ตัวอย่าง:
-                 * [[1,67,6,9]]
-                 * [[ตัวอย่าง]]
-                 * [[123]]
-                 * [[abc,123,XYZ]]
-                 *
-                 * ผลลัพธ์:
-                 * ถูกลบออกทั้งก้อน รวม [[ และ ]]
-                 * ==================================================
-                 */
-
                 case 'removeAIReferences':
 
                     text =
@@ -978,8 +961,14 @@
 
 
         /* ====================================================== */
-        /* ระบบบันทึกข้อความใน output เป็นไฟล์เอกสาร */
+        /* ระบบตรวจสอบสภาพแวดล้อมและบันทึกไฟล์ (แยก Browser vs Application) */
         /* ====================================================== */
+
+        // ฟังก์ชันตรวจสอบว่าเปิดผ่าน Application (แอปพลิเคชัน) / WebView (เว็บวิว) หรือไม่
+        function isWebView() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            return /(wv|iP(hone|ad|od).*AppleWebKit(?!.*Safari))/i.test(userAgent) || !/Chrome|Safari/i.test(userAgent);
+        }
 
         function saveDocument() {
 
@@ -1112,34 +1101,53 @@ ${text}
             type,
             fileName
         ) {
+            if (isWebView()) {
+                // สำหรับ Application (แอปพลิเคชัน) / WebView (เว็บวิว): ใช้ Data URI (ดาต้า URL) เพื่อให้แอปโหลดไฟล์ได้
+                try {
+                    const dataUri = 'data:' + type + ',' + encodeURIComponent(content);
+                    const link = document.createElement('a');
+                    link.href = dataUri;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showSaveToast();
+                } catch (e) {
+                    // กรณีแอปบล็อกเด็ดขาด ให้คัดลอกลง Clipboard (คลิปบอร์ดสำหรับพักข้อมูล) สำรองแทน
+                    navigator.clipboard.writeText(content).then(() => {
+                        alert('แอปไม่อนุญาตให้ดาวน์โหลดไฟล์โดยตรง มะลิคัดลอกข้อความลง Clipboard (คลิปบอร์ด) ให้แทนแล้วค่ะ');
+                    });
+                }
+            } else {
+                // สำหรับ Browser (โปรแกรมท่องเว็บ) ปกติ: ใช้ Blob (ข้อมูลจำลองแบบบล็อบ) ตามโค้ดเดิมเป๊ะๆ
+                const blob =
+                    new Blob(
+                        [content],
+                        { type: type }
+                    );
 
-            const blob =
-                new Blob(
-                    [content],
-                    { type: type }
-                );
-
-            const url =
-                URL.createObjectURL(blob);
+                const url =
+                    URL.createObjectURL(blob);
 
 
-            const link =
-                document.createElement('a');
+                const link =
+                    document.createElement('a');
 
-            link.href = url;
+                link.href = url;
 
-            link.download =
-                fileName;
+                link.download =
+                    fileName;
 
-            document.body.appendChild(link);
+                document.body.appendChild(link);
 
-            link.click();
+                link.click();
 
-            document.body.removeChild(link);
+                document.body.removeChild(link);
 
-            URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url);
 
-            showSaveToast();
+                showSaveToast();
+            }
         }
 
 
@@ -1204,11 +1212,29 @@ ${text}
             );
 
 
-            doc.save(
-                'TheMuiZ_ข้อความ.pdf'
-            );
+            if (isWebView()) {
+                // สำหรับ Application (แอปพลิเคชัน) / WebView (เว็บวิว): แปลง PDF เป็น Data URI (ดาต้า URL)
+                try {
+                    const pdfDataUri = doc.output('datauristring');
+                    const link = document.createElement('a');
+                    link.href = pdfDataUri;
+                    link.download = 'TheMuiZ_ข้อความ.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showSaveToast();
+                } catch (e) {
+                    doc.save('TheMuiZ_ข้อความ.pdf');
+                    showSaveToast();
+                }
+            } else {
+                // สำหรับ Browser (โปรแกรมท่องเว็บ) ปกติ: ใช้คำสั่งเดิมตามปกติ
+                doc.save(
+                    'TheMuiZ_ข้อความ.pdf'
+                );
 
-            showSaveToast();
+                showSaveToast();
+            }
         }
 
 
