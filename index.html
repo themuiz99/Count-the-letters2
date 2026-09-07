@@ -1,220 +1,1268 @@
+เรื่องที่แปลงเว็บเป็น application ที่ฉันให้เธอสอนฉันไปตั้งค่าตรง download ไฟล์อะไรนั่นน่ะเมื่อฉันดาวน์โหลดมาติดตั้งแล้วมันก็ยังดาวน์โหลดไฟล์ไม่ได้อยู่ดีมันเป็นเพราะอะไรเธอลองดูโค้ดของเว็บของฉันสิว่ามันมีอะไรผิดพลาดหรือเปล่า
+
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TheMuiz - Text Chunker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TheMuiZ เครื่องมือจัดการตัวอักษร</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pattaya&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- เพิ่มเฉพาะส่วนสำหรับสร้าง PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-color: #38bdf8;
-            --accent-hover: #0284c7;
-            --border-color: #334155;
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-input: #2a2a2a;
+            --text-main: #e0e0e0;
+            --text-muted: #888888;
+            --accent: #bb86fc;
+            --accent-hover: #9965f4;
+            --btn-bg: #333333;
+            --btn-hover: #444444;
+            --border: #333333;
         }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-        h1 {
-            font-size: 1.5rem;
-            margin-bottom: 16px;
-            color: var(--accent-color);
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 0.9rem;
-        }
-        textarea, input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            background: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-color);
-            font-size: 1rem;
+
+        * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', sans-serif;
         }
-        textarea {
-            height: 150px;
-            resize: vertical;
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 8px;
         }
-        button {
-            background-color: var(--accent-color);
-            color: #0f172a;
-            border: none;
-            padding: 10px 16px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-            width: 100%;
+
+        .header {
+            text-align: center;
+            margin-bottom: 5px;
+            flex-shrink: 0;
         }
-        button:hover {
-            background-color: var(--accent-hover);
-            color: #ffffff;
+
+        .site-title {
+            font-family: 'Pattaya', sans-serif;
+            font-size: 24px;
+            background: linear-gradient(45deg, var(--accent), #ff79c6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin: 0;
+            line-height: 1.1;
         }
-        .results {
-            margin-top: 20px;
+
+        .site-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
         }
-        .chunk-box {
-            background: #0f172a;
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 12px;
+
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            gap: 8px;
         }
-        .chunk-header {
+
+        @media (min-width: 768px) {
+            .workspace {
+                flex-direction: row;
+            }
+        }
+
+        .text-section {
+            display: flex;
+            flex-direction: column;
+            flex: 2;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        .box-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            position: relative;
+            min-height: 0;
+        }
+
+        .box-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: #94a3b8;
+            margin-bottom: 4px;
+            font-size: 13px;
+            flex-shrink: 0;
         }
-        .chunk-content {
-            font-size: 0.95rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-            margin-bottom: 8px;
-            max-height: 100px;
+
+        .btn-group-small button {
+            background: var(--btn-bg);
+            color: var(--text-main);
+            border: none;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-undo {
+            background: #f57c00 !important;
+            color: #fff !important;
+            border: 1px solid #e65100 !important;
+        }
+
+        .btn-danger {
+            background: #d32f2f !important;
+            color: #fff !important;
+            border: 1px solid #b71c1c !important;
+        }
+
+        .btn-success {
+            background: #2e7d32 !important;
+            color: #fff !important;
+            border: 1px solid #1b5e20 !important;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            min-height: 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 14px;
+            resize: none;
+            outline: none;
             overflow-y: auto;
         }
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            width: auto;
-            background: #334155;
-            color: #f8fafc;
+
+        .char-count {
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+            font-size: 10px;
+            color: var(--text-muted);
+            background: rgba(42, 42, 42, 0.8);
+            padding: 1px 4px;
+            border-radius: 4px;
         }
-        .btn-small:hover {
-            background: var(--accent-color);
-            color: #0f172a;
+
+        .custom-remove-sec {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+            font-size: 13px;
+        }
+
+        .custom-remove-sec input {
+            flex: 1;
+            background: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .tools-section {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 6px;
+            border: 1px solid var(--border);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .tools-title {
+            font-size: 12px;
+            color: var(--accent);
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+
+        .tool-btn {
+            color: #fff;
+            border: 1px solid transparent;
+            padding: 4px 2px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn-c1 { background: #b71c1c; }
+        .btn-c2 { background: #c62828; }
+        .btn-c3 { background: #d84315; }
+        .btn-c4 { background: #ef6c00; }
+
+        .btn-c5 { background: #f9a825; }
+        .btn-c6 { background: #9e9d24; }
+        .btn-c7 { background: #558b2f; }
+        .btn-c8 { background: #00695c; }
+
+        .btn-c9 { background: #00838f; }
+        .btn-c10 { background: #0277bd; }
+        .btn-c11 { background: #1565c0; }
+        .btn-c12 { background: #283593; }
+
+        .btn-c13 { background: #4527a0; }
+        .btn-c14 { background: #6a1b9a; }
+        .btn-c15 { background: #ad1457; }
+        .btn-c16 { background: #4e342e; }
+
+        .btn-c17 { background: #bf360c; }
+        .btn-c18 { background: #7b1fa2; }
+        .btn-c19 { background: #004d40; }
+
+        .footer {
+            text-align: center;
+            margin-top: 2px;
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        #toast {
+            visibility: hidden;
+            min-width: 150px;
+            background-color: #4caf50;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 8px;
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* ============================= */
+        /* เพิ่มเฉพาะส่วนปุ่มบันทึกไฟล์ */
+        /* ============================= */
+
+        .save-document-section {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .save-document-section select {
+            background: var(--btn-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 3px 5px;
+            font-size: 11px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn-save-document {
+            background: #1565c0 !important;
+            color: #fff !important;
+            border: 1px solid #0d47a1 !important;
+            padding: 3px 7px !important;
+            border-radius: 4px !important;
+            font-size: 11px !important;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-save-document:hover {
+            background: #1976d2 !important;
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>TheMuiz - ตัวตัดแบ่งข้อความสำหรับ TTS</h1>
-        <div class="form-group">
-            <label for="inputText">ใส่ข้อความที่ต้องการตัดแบ่ง:</label>
-            <textarea id="inputText" placeholder="พิมพ์หรือวางข้อความยาวๆ ตรงนี้..."></textarea>
+
+    <div class="header">
+        <h1 class="site-title">TheMuiZ</h1>
+        <div class="site-subtitle">เครื่องมือจัดการตัวอักษร</div>
+    </div>
+
+    <div class="workspace">
+
+        <div class="text-section">
+
+            <div class="box-container">
+                <div class="box-header">
+                    <span>ช่องกรอกข้อมูล</span>
+
+                    <div class="btn-group-small">
+                        <button onclick="undo()" class="btn-undo">ย้อนกลับ</button>
+                        <button onclick="clearText()" class="btn-danger">ล้างข้อความ</button>
+                    </div>
+                </div>
+
+                <div class="textarea-wrapper">
+                    <textarea id="input-text"></textarea>
+                    <div id="input-count" class="char-count">0 อักษร</div>
+                </div>
+            </div>
+
+            <div class="custom-remove-sec">
+                <span>ลบเฉพาะตัว:</span>
+                <input
+                    type="text"
+                    id="custom-remove-input"
+                    placeholder="a,b,ก (คั่นด้วย ,)"
+                >
+            </div>
+
+            <div class="box-container">
+                <div class="box-header">
+                    <span>ช่องแสดงผลลัพธ์</span>
+
+                    <div class="save-document-section">
+
+                        <button
+                            onclick="copyOutput()"
+                            class="btn-success"
+                        >
+                            คัดลอกข้อความ
+                        </button>
+
+                        <select
+                            id="document-format"
+                            title="เลือกรูปแบบไฟล์"
+                        >
+                            <option value="txt">TXT</option>
+                            <option value="md">MD</option>
+                            <option value="csv">CSV</option>
+                            <option value="html">HTML</option>
+                            <option value="json">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="pdf">PDF</option>
+                        </select>
+
+                        <button
+                            onclick="saveDocument()"
+                            class="btn-save-document"
+                        >
+                            บันทึกไฟล์
+                        </button>
+
+                    </div>
+                </div>
+
+                <div class="textarea-wrapper">
+                    <textarea
+                        id="output-text"
+                        readonly
+                    ></textarea>
+
+                    <div
+                        id="output-count"
+                        class="char-count"
+                    >
+                        0 อักษร
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="charLimit">จำนวนตัวอักษรสูงสุดต่อ 1 ส่วน (Character Limit):</label>
-            <input type="number" id="charLimit" value="500" min="50" max="5000">
+
+        <div class="tools-section">
+
+            <div class="tools-title">
+                เครื่องมือจัดการ
+            </div>
+
+            <div class="tools-grid">
+
+                <button
+                    class="tool-btn btn-c1"
+                    onclick="applyTool('removeAllSymbols')"
+                >
+                    ลบสัญลักษณ์ทั้งหมด
+                </button>
+
+                <button
+                    class="tool-btn btn-c2"
+                    onclick="applyTool('removeSymbolsKeepBasic')"
+                >
+                    ลบสัญลักษณ์พื้นฐาน
+                </button>
+
+                <button
+                    class="tool-btn btn-c3"
+                    onclick="applyTool('removeNumbers')"
+                >
+                    ลบตัวเลขทั้งหมด
+                </button>
+
+                <button
+                    class="tool-btn btn-c18"
+                    onclick="applyTool('removeEnglish')"
+                >
+                    ลบภาษาอังกฤษ
+                </button>
+
+                <button
+                    class="tool-btn btn-c4"
+                    onclick="applyTool('toThaiNumbers')"
+                >
+                    เปลี่ยนเป็นเลขไทย
+                </button>
+
+                <button
+                    class="tool-btn btn-c5"
+                    onclick="applyTool('toArabicNumbers')"
+                >
+                    เปลี่ยนเป็นอารบิก
+                </button>
+
+                <button
+                    class="tool-btn btn-c6"
+                    onclick="applyTool('upperCaseEng')"
+                >
+                    EN พิมพ์ใหญ่
+                </button>
+
+                <button
+                    class="tool-btn btn-c7"
+                    onclick="applyTool('lowerCaseEng')"
+                >
+                    EN พิมพ์เล็ก
+                </button>
+
+                <button
+                    class="tool-btn btn-c8"
+                    onclick="applyTool('capitalizeEng')"
+                    style="grid-column: span 2;"
+                >
+                    EN ขึ้นต้นพิมพ์ใหญ่
+                </button>
+
+                <button
+                    class="tool-btn btn-c9"
+                    onclick="applyTool('removeSpaces')"
+                >
+                    ลบเว้นวรรค
+                </button>
+
+                <button
+                    class="tool-btn btn-c10"
+                    onclick="applyTool('removeNewlines')"
+                >
+                    ลบขึ้นบรรทัดใหม่
+                </button>
+
+                <button
+                    class="tool-btn btn-c11"
+                    onclick="applyTool('removeDuplicateSpaces')"
+                >
+                    ลบเว้นวรรคซ้ำ
+                </button>
+
+                <button
+                    class="tool-btn btn-c12"
+                    onclick="applyTool('removeDuplicateLines')"
+                >
+                    ลบบรรทัดซ้ำ
+                </button>
+
+                <button
+                    class="tool-btn btn-c13"
+                    onclick="applyTool('extractNumbers')"
+                >
+                    ดึงเฉพาะตัวเลข
+                </button>
+
+                <button
+                    class="tool-btn btn-c14"
+                    onclick="applyTool('extractThai')"
+                >
+                    ดึงเฉพาะภาษาไทย
+                </button>
+
+                <button
+                    class="tool-btn btn-c15"
+                    onclick="applyTool('extractEnglish')"
+                >
+                    ดึงเฉพาะภาษาอังกฤษ
+                </button>
+
+                <button
+                    class="tool-btn btn-c16"
+                    onclick="applyTool('reverseText')"
+                >
+                    กลับหลังหันข้อความ
+                </button>
+
+                <button
+                    class="tool-btn btn-c17"
+                    onclick="applyTool('removeLinks')"
+                >
+                    ลบลิงก์ (URL)
+                </button>
+
+                <button
+                    class="tool-btn btn-c19"
+                    onclick="applyTool('removeAIReferences')"
+                >
+                    ลบแหล่งอ้างอิง AI
+                </button>
+
+            </div>
         </div>
-        <div class="form-group">
-            <button onclick="splitText()">ตัดแบ่งข้อความ (Split Text)</button>
-        </div>
-        
-        <div class="results" id="resultsContainer"></div>
+    </div>
+
+    <div class="footer">
+        &copy; สงวนลิขสิทธิ์โดย TheMuiz
+    </div>
+
+    <div id="toast">
+        คัดลอกข้อความสำเร็จ!
     </div>
 
     <script>
-        // ฟังก์ชันตรวจสอบว่ารันอยู่ใน Application (แอปพลิเคชัน) หรือ WebView (เว็บวิว) หรือไม่
-        function isWebView() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            return /(wv|iP(hone|ad|od).*AppleWebKit(?!.*Safari))/i.test(userAgent) || !/Chrome|Safari/i.test(userAgent);
-        }
 
-        // ฟังก์ชันดาวน์โหลดไฟล์แยกตามสภาพแวดล้อม (Browser vs Application)
-        function downloadFile(filename, text) {
-            if (isWebView()) {
-                // รูปแบบสำหรับ Application (แอปพลิเคชัน) / WebView (เว็บวิว): ใช้ Data URL (ดาต้า URL)
-                try {
-                    const dataUri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
-                    const link = document.createElement('a');
-                    link.href = dataUri;
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } catch (e) {
-                    // ระบบสำรองกรณีแอปบล็อก: ใช้ Clipboard (คลิปบอร์ดสำหรับพักข้อมูล)
-                    navigator.clipboard.writeText(text).then(() => {
-                        alert('แอปไม่อนุญาตให้ดาวน์โหลดไฟล์โดยตรง มะลิคัดลอกข้อความลง Clipboard (คลิปบอร์ด) ให้เรียบร้อยแล้วค่ะ');
-                    });
-                }
-            } else {
-                // รูปแบบสำหรับ Browser (โปรแกรมท่องเว็บ) ปกติ: ใช้ Blob (ข้อมูลจำลองแบบบล็อบ) ตามเดิม
-                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
+        const inputArea =
+            document.getElementById('input-text');
+
+        const outputArea =
+            document.getElementById('output-text');
+
+        const customRemoveInput =
+            document.getElementById('custom-remove-input');
+
+        const inputCount =
+            document.getElementById('input-count');
+
+        const outputCount =
+            document.getElementById('output-count');
+
+        const toast =
+            document.getElementById('toast');
+
+
+        // เก็บประวัติผลลัพธ์เพื่อรองรับการ Undo ทุกย่างก้าว
+        let outputHistory = [""];
+
+
+        function saveState(text) {
+
+            // บันทึกเฉพาะเมื่อข้อความใหม่ไม่ซ้ำกับอันล่าสุด
+            if (
+                outputHistory[outputHistory.length - 1] !== text
+            ) {
+                outputHistory.push(text);
             }
         }
 
-        function splitText() {
-            const text = document.getElementById('inputText').value;
-            const limit = parseInt(document.getElementById('charLimit').value) || 500;
-            const container = document.getElementById('resultsContainer');
-            container.innerHTML = '';
+
+        function undo() {
+
+            if (outputHistory.length > 1) {
+
+                outputHistory.pop();
+
+                const previousState =
+                    outputHistory[outputHistory.length - 1];
+
+                outputArea.value = previousState;
+
+                outputCount.innerText =
+                    `${outputArea.value.length} อักษร`;
+            }
+        }
+
+
+        function clearText() {
+
+            outputHistory = [""];
+
+            inputArea.value = "";
+            outputArea.value = "";
+
+            inputCount.innerText = "0 อักษร";
+            outputCount.innerText = "0 อักษร";
+        }
+
+
+        function copyOutput() {
+
+            const t =
+                document.createElement('textarea');
+
+            t.value = outputArea.value;
+
+            document.body.appendChild(t);
+
+            t.select();
+
+            document.execCommand('copy');
+
+            document.body.removeChild(t);
+
+            toast.innerText =
+                "คัดลอกข้อความสำเร็จ!";
+
+            toast.className = "show";
+
+            setTimeout(
+                () => toast.className = "",
+                2000
+            );
+        }
+
+
+        function processOutput() {
+
+            let text = inputArea.value;
+
+            const removeStr =
+                customRemoveInput.value;
+
+            if (removeStr) {
+
+                const chars =
+                    removeStr
+                        .split(',')
+                        .map(c =>
+                            c.replace(
+                                /[.*+?^${}()|[\]\\]/g,
+                                '\\$&'
+                            )
+                        );
+
+                text =
+                    text.replace(
+                        new RegExp(
+                            `(${chars.join('|')})`,
+                            'g'
+                        ),
+                        ''
+                    );
+            }
+
+            outputArea.value = text;
+
+            inputCount.innerText =
+                `${inputArea.value.length} อักษร`;
+
+            outputCount.innerText =
+                `${outputArea.value.length} อักษร`;
+
+            saveState(text);
+        }
+
+
+        inputArea.addEventListener(
+            'input',
+            () => {
+                processOutput();
+            }
+        );
+
+
+        customRemoveInput.addEventListener(
+            'input',
+            processOutput
+        );
+
+
+        function applyTool(action) {
+
+            let text = inputArea.value;
+
+            const removeStr =
+                customRemoveInput.value;
+
+            if (removeStr) {
+
+                const chars =
+                    removeStr
+                        .split(',')
+                        .map(c =>
+                            c.replace(
+                                /[.*+?^${}()|[\]\\]/g,
+                                '\\$&'
+                            )
+                        );
+
+                text =
+                    text.replace(
+                        new RegExp(
+                            `(${chars.join('|')})`,
+                            'g'
+                        ),
+                        ''
+                    );
+            }
+
+
+            switch(action) {
+
+                case 'removeAllSymbols':
+                    text =
+                        text.replace(
+                            /[^\p{L}\p{M}\p{N}\s]/gu,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeSymbolsKeepBasic':
+                    text =
+                        text.replace(
+                            /[^\p{L}\p{M}\p{N}\s.,!?"'\-()]/gu,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeNumbers':
+                    text =
+                        text.replace(
+                            /[0-9๐-๙]/g,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeEnglish':
+                    text =
+                        text.replace(
+                            /[a-zA-Z]/g,
+                            ''
+                        );
+                    break;
+
+
+                case 'toThaiNumbers':
+                    text =
+                        text.replace(
+                            /[0-9]/g,
+                            m =>
+                                ({
+                                    '0':'๐',
+                                    '1':'๑',
+                                    '2':'๒',
+                                    '3':'๓',
+                                    '4':'๔',
+                                    '5':'๕',
+                                    '6':'๖',
+                                    '7':'๗',
+                                    '8':'๘',
+                                    '9':'๙'
+                                })[m]
+                        );
+                    break;
+
+
+                case 'toArabicNumbers':
+                    text =
+                        text.replace(
+                            /[๐-๙]/g,
+                            m =>
+                                ({
+                                    '๐':'0',
+                                    '๑':'1',
+                                    '๒':'2',
+                                    '๓':'3',
+                                    '๔':'4',
+                                    '๕':'5',
+                                    '๖':'6',
+                                    '๗':'7',
+                                    '๘':'8',
+                                    '๙':'9'
+                                })[m]
+                        );
+                    break;
+
+
+                case 'upperCaseEng':
+                    text =
+                        text.replace(
+                            /[a-z]/g,
+                            m => m.toUpperCase()
+                        );
+                    break;
+
+
+                case 'lowerCaseEng':
+                    text =
+                        text.replace(
+                            /[A-Z]/g,
+                            m => m.toLowerCase()
+                        );
+                    break;
+
+
+                case 'capitalizeEng':
+                    text =
+                        text.replace(
+                            /\b[a-zA-Z]/g,
+                            m => m.toUpperCase()
+                        );
+                    break;
+
+
+                case 'removeSpaces':
+                    text =
+                        text.replace(
+                            /[ \t]+/g,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeNewlines':
+                    text =
+                        text.replace(
+                            /[\r\n]+/g,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeDuplicateSpaces':
+                    text =
+                        text.replace(
+                            /[ \t]{2,}/g,
+                            ' '
+                        );
+                    break;
+
+
+                case 'removeDuplicateLines':
+                    text =
+                        text.replace(
+                            /(\r?\n){2,}/g,
+                            '\n'
+                        );
+                    break;
+
+
+                case 'extractNumbers':
+
+                    const n =
+                        text.match(
+                            /[0-9๐-๙]+/g
+                        );
+
+                    text =
+                        n ? n.join('\n') : '';
+
+                    break;
+
+
+                case 'extractThai':
+
+                    const t =
+                        text.match(
+                            /[ก-๙]+/g
+                        );
+
+                    text =
+                        t ? t.join('\n') : '';
+
+                    break;
+
+
+                case 'extractEnglish':
+
+                    const e =
+                        text.match(
+                            /[a-zA-Z]+/g
+                        );
+
+                    text =
+                        e ? e.join('\n') : '';
+
+                    break;
+
+
+                case 'reverseText':
+
+                    text =
+                        text
+                            .split('')
+                            .reverse()
+                            .join('');
+
+                    break;
+
+
+                case 'removeLinks':
+
+                    text =
+                        text.replace(
+                            /(?:https?:\/\/|www\.)[^\s]+/gi,
+                            ''
+                        );
+
+                    break;
+
+
+                /*
+                 * ==================================================
+                 * แก้ไขการลบแหล่งอ้างอิง AI
+                 *
+                 * จะลบทุกอย่างที่อยู่ระหว่าง [[ และ ]]
+                 *
+                 * ตัวอย่าง:
+                 * [[1,67,6,9]]
+                 * [[ตัวอย่าง]]
+                 * [[123]]
+                 * [[abc,123,XYZ]]
+                 *
+                 * ผลลัพธ์:
+                 * ถูกลบออกทั้งก้อน รวม [[ และ ]]
+                 * ==================================================
+                 */
+
+                case 'removeAIReferences':
+
+                    text =
+                        text.replace(
+                            /\[\[[\s\S]*?\]\]/g,
+                            ''
+                        );
+
+                    break;
+            }
+
+
+            outputArea.value = text;
+
+            outputCount.innerText =
+                `${text.length} อักษร`;
+
+            saveState(text);
+        }
+
+
+        /* ====================================================== */
+        /* ระบบบันทึกข้อความใน output เป็นไฟล์เอกสาร */
+        /* ====================================================== */
+
+        function saveDocument() {
+
+            const text =
+                outputArea.value;
+
+            const format =
+                document.getElementById(
+                    'document-format'
+                ).value;
+
 
             if (!text.trim()) {
-                alert('รบกวนใส่ข้อความก่อนนะคะพี่มุ่ย!');
+
+                alert(
+                    'ไม่มีข้อความในช่องแสดงผลลัพธ์สำหรับบันทึก'
+                );
+
                 return;
             }
 
-            let chunks = [];
-            let index = 0;
-            
-            while (index < text.length) {
-                let chunk = text.substr(index, limit);
-                chunks.push(chunk);
-                index += limit;
+
+            const fileName =
+                `TheMuiZ_ข้อความ.${format}`;
+
+
+            if (format === 'txt') {
+
+                downloadBlob(
+                    text,
+                    'text/plain;charset=utf-8',
+                    fileName
+                );
+
             }
 
-            chunks.forEach((chunk, i) => {
-                const box = document.createElement('div');
-                box.className = 'chunk-box';
-                
-                const header = document.createElement('div');
-                header.className = 'chunk-header';
-                header.innerHTML = `<span>ส่วนที่ ${i + 1} (${chunk.length} ตัวอักษร)</span>`;
 
-                const btn = document.createElement('button');
-                btn.className = 'btn-small';
-                btn.textContent = 'ดาวน์โหลดไฟล์นี้ (Download)';
-                btn.onclick = () => {
-                    downloadFile(`themuiz_chunk_${i + 1}.txt`, chunk);
-                };
+            else if (format === 'md') {
 
-                header.appendChild(btn);
+                downloadBlob(
+                    text,
+                    'text/markdown;charset=utf-8',
+                    fileName
+                );
 
-                const content = document.createElement('div');
-                content.className = 'chunk-content';
-                content.textContent = chunk;
+            }
 
-                box.appendChild(header);
-                box.appendChild(content);
-                container.appendChild(box);
-            });
+
+            else if (format === 'csv') {
+
+                downloadBlob(
+                    '\uFEFF' + text,
+                    'text/csv;charset=utf-8',
+                    fileName
+                );
+
+            }
+
+
+            else if (format === 'html') {
+
+                const htmlContent =
+`<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>TheMuiZ</title>
+</head>
+<body>
+<pre>${escapeHtml(text)}</pre>
+</body>
+</html>`;
+
+                downloadBlob(
+                    htmlContent,
+                    'text/html;charset=utf-8',
+                    fileName
+                );
+            }
+
+
+            else if (format === 'json') {
+
+                const jsonContent =
+                    JSON.stringify(
+                        {
+                            source: 'TheMuiZ',
+                            content: text
+                        },
+                        null,
+                        2
+                    );
+
+                downloadBlob(
+                    jsonContent,
+                    'application/json;charset=utf-8',
+                    fileName
+                );
+            }
+
+
+            else if (format === 'xml') {
+
+                const xmlContent =
+`<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <source>TheMuiZ</source>
+    <content><![CDATA[
+${text}
+    ]]></content>
+</document>`;
+
+                downloadBlob(
+                    xmlContent,
+                    'application/xml;charset=utf-8',
+                    fileName
+                );
+            }
+
+
+            else if (format === 'pdf') {
+
+                saveAsPDF(text);
+            }
         }
+
+
+        function downloadBlob(
+            content,
+            type,
+            fileName
+        ) {
+
+            const blob =
+                new Blob(
+                    [content],
+                    { type: type }
+                );
+
+            const url =
+                URL.createObjectURL(blob);
+
+
+            const link =
+                document.createElement('a');
+
+            link.href = url;
+
+            link.download =
+                fileName;
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+
+            showSaveToast();
+        }
+
+
+        function saveAsPDF(text) {
+
+            const {
+                jsPDF
+            } = window.jspdf;
+
+            const doc =
+                new jsPDF();
+
+
+            const pageWidth =
+                doc.internal.pageSize.getWidth();
+
+            const margin = 15;
+
+            const maxWidth =
+                pageWidth -
+                (margin * 2);
+
+
+            doc.setFont(
+                'helvetica',
+                'normal'
+            );
+
+            doc.setFontSize(12);
+
+
+            const lines =
+                doc.splitTextToSize(
+                    text,
+                    maxWidth
+                );
+
+
+            let y = 20;
+
+            const lineHeight = 7;
+
+
+            lines.forEach(
+                line => {
+
+                    if (y > 280) {
+
+                        doc.addPage();
+
+                        y = 20;
+                    }
+
+                    doc.text(
+                        line,
+                        margin,
+                        y
+                    );
+
+                    y += lineHeight;
+                }
+            );
+
+
+            doc.save(
+                'TheMuiZ_ข้อความ.pdf'
+            );
+
+            showSaveToast();
+        }
+
+
+        function escapeHtml(text) {
+
+            return text
+                .replace(
+                    /&/g,
+                    '&amp;'
+                )
+                .replace(
+                    /</g,
+                    '&lt;'
+                )
+                .replace(
+                    />/g,
+                    '&gt;'
+                )
+                .replace(
+                    /"/g,
+                    '&quot;'
+                )
+                .replace(
+                    /'/g,
+                    '&#039;'
+                );
+        }
+
+
+        function showSaveToast() {
+
+            toast.innerText =
+                'บันทึกไฟล์สำเร็จ!';
+
+            toast.className =
+                "show";
+
+
+            setTimeout(
+                () => {
+
+                    toast.className = "";
+
+                    toast.innerText =
+                        "คัดลอกข้อความสำเร็จ!";
+
+                },
+                2000
+            );
+        }
+
     </script>
 </body>
 </html>
