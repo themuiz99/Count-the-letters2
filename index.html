@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
     <title>TheMuiZ เครื่องมือจัดการตัวอักษร</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Pattaya&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
 
-    <!-- jsPDF -->
+    <!-- เพิ่มเฉพาะส่วนสำหรับสร้าง PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-
         :root {
             --bg-main: #121212;
             --bg-card: #1e1e1e;
@@ -106,11 +103,6 @@
             margin-bottom: 4px;
             font-size: 13px;
             flex-shrink: 0;
-        }
-
-        .btn-group-small {
-            display: flex;
-            gap: 4px;
         }
 
         .btn-group-small button {
@@ -266,7 +258,7 @@
 
         #toast {
             visibility: hidden;
-            min-width: 180px;
+            min-width: 150px;
             background-color: #4caf50;
             color: #fff;
             text-align: center;
@@ -279,7 +271,6 @@
             opacity: 0;
             transition: opacity 0.3s;
             font-size: 12px;
-            z-index: 9999;
         }
 
         #toast.show {
@@ -288,7 +279,7 @@
         }
 
         /* ============================= */
-        /* ระบบบันทึกไฟล์ */
+        /* เพิ่มเฉพาะส่วนปุ่มบันทึกไฟล์ */
         /* ============================= */
 
         .save-document-section {
@@ -322,9 +313,7 @@
         .btn-save-document:hover {
             background: #1976d2 !important;
         }
-
     </style>
-
 </head>
 
 <body>
@@ -334,86 +323,52 @@
         <div class="site-subtitle">เครื่องมือจัดการตัวอักษร</div>
     </div>
 
-
     <div class="workspace">
-
 
         <div class="text-section">
 
-
             <div class="box-container">
-
                 <div class="box-header">
-
                     <span>ช่องกรอกข้อมูล</span>
 
                     <div class="btn-group-small">
-
-                        <button
-                            onclick="undo()"
-                            class="btn-undo">
-                            ย้อนกลับ
-                        </button>
-
-                        <button
-                            onclick="clearText()"
-                            class="btn-danger">
-                            ล้างข้อความ
-                        </button>
-
+                        <button onclick="undo()" class="btn-undo">ย้อนกลับ</button>
+                        <button onclick="clearText()" class="btn-danger">ล้างข้อความ</button>
                     </div>
-
                 </div>
-
 
                 <div class="textarea-wrapper">
-
                     <textarea id="input-text"></textarea>
-
-                    <div
-                        id="input-count"
-                        class="char-count">
-                        0 อักษร
-                    </div>
-
+                    <div id="input-count" class="char-count">0 อักษร</div>
                 </div>
-
             </div>
 
-
             <div class="custom-remove-sec">
-
                 <span>ลบเฉพาะตัว:</span>
-
                 <input
                     type="text"
                     id="custom-remove-input"
-                    placeholder="a,b,ก (คั่นด้วย ,)">
-
+                    placeholder="a,b,ก (คั่นด้วย ,)"
+                >
             </div>
 
-
             <div class="box-container">
-
                 <div class="box-header">
-
                     <span>ช่องแสดงผลลัพธ์</span>
-
 
                     <div class="save-document-section">
 
-
                         <button
                             onclick="copyOutput()"
-                            class="btn-success">
+                            class="btn-success"
+                        >
                             คัดลอกข้อความ
                         </button>
 
-
                         <select
                             id="document-format"
-                            title="เลือกรูปแบบไฟล์">
-
+                            title="เลือกรูปแบบไฟล์"
+                        >
                             <option value="txt">TXT</option>
                             <option value="md">MD</option>
                             <option value="csv">CSV</option>
@@ -421,313 +376,267 @@
                             <option value="json">JSON</option>
                             <option value="xml">XML</option>
                             <option value="pdf">PDF</option>
-
                         </select>
-
 
                         <button
                             onclick="saveDocument()"
-                            class="btn-save-document">
+                            class="btn-save-document"
+                        >
                             บันทึกไฟล์
                         </button>
 
-
                     </div>
-
                 </div>
 
-
                 <div class="textarea-wrapper">
-
                     <textarea
                         id="output-text"
-                        readonly></textarea>
+                        readonly
+                    ></textarea>
 
                     <div
                         id="output-count"
-                        class="char-count">
+                        class="char-count"
+                    >
                         0 อักษร
                     </div>
-
                 </div>
-
             </div>
-
-
         </div>
 
-
         <div class="tools-section">
-
 
             <div class="tools-title">
                 เครื่องมือจัดการ
             </div>
 
-
             <div class="tools-grid">
-
 
                 <button
                     class="tool-btn btn-c1"
-                    onclick="applyTool('removeAllSymbols')">
+                    onclick="applyTool('removeAllSymbols')"
+                >
                     ลบสัญลักษณ์ทั้งหมด
                 </button>
 
-
                 <button
                     class="tool-btn btn-c2"
-                    onclick="applyTool('removeSymbolsKeepBasic')">
+                    onclick="applyTool('removeSymbolsKeepBasic')"
+                >
                     ลบสัญลักษณ์พื้นฐาน
                 </button>
 
-
                 <button
                     class="tool-btn btn-c3"
-                    onclick="applyTool('removeNumbers')">
+                    onclick="applyTool('removeNumbers')"
+                >
                     ลบตัวเลขทั้งหมด
                 </button>
 
-
                 <button
                     class="tool-btn btn-c18"
-                    onclick="applyTool('removeEnglish')">
+                    onclick="applyTool('removeEnglish')"
+                >
                     ลบภาษาอังกฤษ
                 </button>
 
-
                 <button
                     class="tool-btn btn-c4"
-                    onclick="applyTool('toThaiNumbers')">
+                    onclick="applyTool('toThaiNumbers')"
+                >
                     เปลี่ยนเป็นเลขไทย
                 </button>
 
-
                 <button
                     class="tool-btn btn-c5"
-                    onclick="applyTool('toArabicNumbers')">
+                    onclick="applyTool('toArabicNumbers')"
+                >
                     เปลี่ยนเป็นอารบิก
                 </button>
 
-
                 <button
                     class="tool-btn btn-c6"
-                    onclick="applyTool('upperCaseEng')">
+                    onclick="applyTool('upperCaseEng')"
+                >
                     EN พิมพ์ใหญ่
                 </button>
 
-
                 <button
                     class="tool-btn btn-c7"
-                    onclick="applyTool('lowerCaseEng')">
+                    onclick="applyTool('lowerCaseEng')"
+                >
                     EN พิมพ์เล็ก
                 </button>
-
 
                 <button
                     class="tool-btn btn-c8"
                     onclick="applyTool('capitalizeEng')"
-                    style="grid-column: span 2;">
+                    style="grid-column: span 2;"
+                >
                     EN ขึ้นต้นพิมพ์ใหญ่
                 </button>
 
-
                 <button
                     class="tool-btn btn-c9"
-                    onclick="applyTool('removeSpaces')">
+                    onclick="applyTool('removeSpaces')"
+                >
                     ลบเว้นวรรค
                 </button>
 
-
                 <button
                     class="tool-btn btn-c10"
-                    onclick="applyTool('removeNewlines')">
+                    onclick="applyTool('removeNewlines')"
+                >
                     ลบขึ้นบรรทัดใหม่
                 </button>
 
-
                 <button
                     class="tool-btn btn-c11"
-                    onclick="applyTool('removeDuplicateSpaces')">
+                    onclick="applyTool('removeDuplicateSpaces')"
+                >
                     ลบเว้นวรรคซ้ำ
                 </button>
 
-
                 <button
                     class="tool-btn btn-c12"
-                    onclick="applyTool('removeDuplicateLines')">
+                    onclick="applyTool('removeDuplicateLines')"
+                >
                     ลบบรรทัดซ้ำ
                 </button>
 
-
                 <button
                     class="tool-btn btn-c13"
-                    onclick="applyTool('extractNumbers')">
+                    onclick="applyTool('extractNumbers')"
+                >
                     ดึงเฉพาะตัวเลข
                 </button>
 
-
                 <button
                     class="tool-btn btn-c14"
-                    onclick="applyTool('extractThai')">
+                    onclick="applyTool('extractThai')"
+                >
                     ดึงเฉพาะภาษาไทย
                 </button>
 
-
                 <button
                     class="tool-btn btn-c15"
-                    onclick="applyTool('extractEnglish')">
+                    onclick="applyTool('extractEnglish')"
+                >
                     ดึงเฉพาะภาษาอังกฤษ
                 </button>
 
-
                 <button
                     class="tool-btn btn-c16"
-                    onclick="applyTool('reverseText')">
+                    onclick="applyTool('reverseText')"
+                >
                     กลับหลังหันข้อความ
                 </button>
 
-
                 <button
                     class="tool-btn btn-c17"
-                    onclick="applyTool('removeLinks')">
+                    onclick="applyTool('removeLinks')"
+                >
                     ลบลิงก์ (URL)
                 </button>
 
-
                 <button
                     class="tool-btn btn-c19"
-                    onclick="applyTool('removeAIReferences')">
+                    onclick="applyTool('removeAIReferences')"
+                >
                     ลบแหล่งอ้างอิง AI
                 </button>
 
-
             </div>
-
         </div>
-
     </div>
-
 
     <div class="footer">
         &copy; สงวนลิขสิทธิ์โดย TheMuiz
     </div>
 
-
     <div id="toast">
         คัดลอกข้อความสำเร็จ!
     </div>
 
+    <script>
 
-<script>
+        const inputArea =
+            document.getElementById('input-text');
 
-    /* ========================================================= */
-    /* DOM */
-    /* ========================================================= */
+        const outputArea =
+            document.getElementById('output-text');
 
-    const inputArea =
-        document.getElementById('input-text');
+        const customRemoveInput =
+            document.getElementById('custom-remove-input');
 
-    const outputArea =
-        document.getElementById('output-text');
+        const inputCount =
+            document.getElementById('input-count');
 
-    const customRemoveInput =
-        document.getElementById('custom-remove-input');
+        const outputCount =
+            document.getElementById('output-count');
 
-    const inputCount =
-        document.getElementById('input-count');
-
-    const outputCount =
-        document.getElementById('output-count');
-
-    const toast =
-        document.getElementById('toast');
+        const toast =
+            document.getElementById('toast');
 
 
-    /* ========================================================= */
-    /* History */
-    /* ========================================================= */
-
-    let outputHistory = [""];
+        // เก็บประวัติผลลัพธ์เพื่อรองรับการ Undo ทุกย่างก้าว
+        let outputHistory = [""];
 
 
-    function saveState(text) {
+        function saveState(text) {
 
-        if (
-            outputHistory[outputHistory.length - 1] !== text
-        ) {
-            outputHistory.push(text);
-        }
-
-    }
-
-
-    function undo() {
-
-        if (outputHistory.length > 1) {
-
-            outputHistory.pop();
-
-            const previousState =
-                outputHistory[outputHistory.length - 1];
-
-            outputArea.value = previousState;
-
-            outputCount.innerText =
-                `${outputArea.value.length} อักษร`;
-
-        }
-
-    }
-
-
-    function clearText() {
-
-        outputHistory = [""];
-
-        inputArea.value = "";
-        outputArea.value = "";
-
-        inputCount.innerText = "0 อักษร";
-        outputCount.innerText = "0 อักษร";
-
-    }
-
-
-    /* ========================================================= */
-    /* Copy */
-    /* ========================================================= */
-
-    async function copyOutput() {
-
-        const text =
-            outputArea.value;
-
-        try {
-
+            // บันทึกเฉพาะเมื่อข้อความใหม่ไม่ซ้ำกับอันล่าสุด
             if (
-                navigator.clipboard &&
-                window.isSecureContext
+                outputHistory[outputHistory.length - 1] !== text
             ) {
-
-                await navigator.clipboard.writeText(text);
-
-            } else {
-
-                const t =
-                    document.createElement('textarea');
-
-                t.value = text;
-
-                document.body.appendChild(t);
-
-                t.select();
-
-                document.execCommand('copy');
-
-                document.body.removeChild(t);
-
+                outputHistory.push(text);
             }
+        }
+
+
+        function undo() {
+
+            if (outputHistory.length > 1) {
+
+                outputHistory.pop();
+
+                const previousState =
+                    outputHistory[outputHistory.length - 1];
+
+                outputArea.value = previousState;
+
+                outputCount.innerText =
+                    `${outputArea.value.length} อักษร`;
+            }
+        }
+
+
+        function clearText() {
+
+            outputHistory = [""];
+
+            inputArea.value = "";
+            outputArea.value = "";
+
+            inputCount.innerText = "0 อักษร";
+            outputCount.innerText = "0 อักษร";
+        }
+
+
+        function copyOutput() {
+
+            const t =
+                document.createElement('textarea');
+
+            t.value = outputArea.value;
+
+            document.body.appendChild(t);
+
+            t.select();
+
+            document.execCommand('copy');
+
+            document.body.removeChild(t);
 
             toast.innerText =
                 "คัดลอกข้อความสำเร็จ!";
@@ -738,47 +647,27 @@
                 () => toast.className = "",
                 2000
             );
-
-        } catch (error) {
-
-            alert(
-                "ไม่สามารถคัดลอกข้อความได้"
-            );
-
         }
 
-    }
 
+        function processOutput() {
 
-    /* ========================================================= */
-    /* Process */
-    /* ========================================================= */
+            let text = inputArea.value;
 
-    function processOutput() {
+            const removeStr =
+                customRemoveInput.value;
 
-        let text =
-            inputArea.value;
+            if (removeStr) {
 
-        const removeStr =
-            customRemoveInput.value;
-
-
-        if (removeStr) {
-
-            const chars =
-                removeStr
-                    .split(',')
-                    .map(c =>
-                        c.trim()
-                            .replace(
+                const chars =
+                    removeStr
+                        .split(',')
+                        .map(c =>
+                            c.replace(
                                 /[.*+?^${}()|[\]\\]/g,
                                 '\\$&'
                             )
-                    )
-                    .filter(Boolean);
-
-
-            if (chars.length > 0) {
+                        );
 
                 text =
                     text.replace(
@@ -788,70 +677,52 @@
                         ),
                         ''
                     );
-
             }
 
+            outputArea.value = text;
+
+            inputCount.innerText =
+                `${inputArea.value.length} อักษร`;
+
+            outputCount.innerText =
+                `${outputArea.value.length} อักษร`;
+
+            saveState(text);
         }
 
 
-        outputArea.value =
-            text;
+        inputArea.addEventListener(
+            'input',
+            () => {
+                processOutput();
+            }
+        );
 
 
-        inputCount.innerText =
-            `${inputArea.value.length} อักษร`;
+        customRemoveInput.addEventListener(
+            'input',
+            processOutput
+        );
 
 
-        outputCount.innerText =
-            `${outputArea.value.length} อักษร`;
+        function applyTool(action) {
 
+            let text = inputArea.value;
 
-        saveState(text);
+            const removeStr =
+                customRemoveInput.value;
 
-    }
+            if (removeStr) {
 
-
-    inputArea.addEventListener(
-        'input',
-        processOutput
-    );
-
-
-    customRemoveInput.addEventListener(
-        'input',
-        processOutput
-    );
-
-
-    /* ========================================================= */
-    /* Tools */
-    /* ========================================================= */
-
-    function applyTool(action) {
-
-        let text =
-            inputArea.value;
-
-        const removeStr =
-            customRemoveInput.value;
-
-
-        if (removeStr) {
-
-            const chars =
-                removeStr
-                    .split(',')
-                    .map(c =>
-                        c.trim()
-                            .replace(
+                const chars =
+                    removeStr
+                        .split(',')
+                        .map(c =>
+                            c.replace(
                                 /[.*+?^${}()|[\]\\]/g,
                                 '\\$&'
                             )
-                    )
-                    .filter(Boolean);
-
-
-            if (chars.length > 0) {
+                        );
 
                 text =
                     text.replace(
@@ -861,1173 +732,537 @@
                         ),
                         ''
                     );
+            }
+
+
+            switch(action) {
+
+                case 'removeAllSymbols':
+                    text =
+                        text.replace(
+                            /[^\p{L}\p{M}\p{N}\s]/gu,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeSymbolsKeepBasic':
+                    text =
+                        text.replace(
+                            /[^\p{L}\p{M}\p{N}\s.,!?"'\-()]/gu,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeNumbers':
+                    text =
+                        text.replace(
+                            /[0-9๐-๙]/g,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeEnglish':
+                    text =
+                        text.replace(
+                            /[a-zA-Z]/g,
+                            ''
+                        );
+                    break;
+
+
+                case 'toThaiNumbers':
+                    text =
+                        text.replace(
+                            /[0-9]/g,
+                            m =>
+                                ({
+                                    '0':'๐',
+                                    '1':'๑',
+                                    '2':'๒',
+                                    '3':'๓',
+                                    '4':'๔',
+                                    '5':'๕',
+                                    '6':'๖',
+                                    '7':'๗',
+                                    '8':'๘',
+                                    '9':'๙'
+                                })[m]
+                        );
+                    break;
+
+
+                case 'toArabicNumbers':
+                    text =
+                        text.replace(
+                            /[๐-๙]/g,
+                            m =>
+                                ({
+                                    '๐':'0',
+                                    '๑':'1',
+                                    '๒':'2',
+                                    '๓':'3',
+                                    '๔':'4',
+                                    '๕':'5',
+                                    '๖':'6',
+                                    '๗':'7',
+                                    '๘':'8',
+                                    '๙':'9'
+                                })[m]
+                        );
+                    break;
+
+
+                case 'upperCaseEng':
+                    text =
+                        text.replace(
+                            /[a-z]/g,
+                            m => m.toUpperCase()
+                        );
+                    break;
+
+
+                case 'lowerCaseEng':
+                    text =
+                        text.replace(
+                            /[A-Z]/g,
+                            m => m.toLowerCase()
+                        );
+                    break;
+
+
+                case 'capitalizeEng':
+                    text =
+                        text.replace(
+                            /\b[a-zA-Z]/g,
+                            m => m.toUpperCase()
+                        );
+                    break;
+
+
+                case 'removeSpaces':
+                    text =
+                        text.replace(
+                            /[ \t]+/g,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeNewlines':
+                    text =
+                        text.replace(
+                            /[\r\n]+/g,
+                            ''
+                        );
+                    break;
+
+
+                case 'removeDuplicateSpaces':
+                    text =
+                        text.replace(
+                            /[ \t]{2,}/g,
+                            ' '
+                        );
+                    break;
+
+
+                case 'removeDuplicateLines':
+                    text =
+                        text.replace(
+                            /(\r?\n){2,}/g,
+                            '\n'
+                        );
+                    break;
+
+
+                case 'extractNumbers':
+
+                    const n =
+                        text.match(
+                            /[0-9๐-๙]+/g
+                        );
+
+                    text =
+                        n ? n.join('\n') : '';
+
+                    break;
+
+
+                case 'extractThai':
+
+                    const t =
+                        text.match(
+                            /[ก-๙]+/g
+                        );
+
+                    text =
+                        t ? t.join('\n') : '';
+
+                    break;
+
+
+                case 'extractEnglish':
+
+                    const e =
+                        text.match(
+                            /[a-zA-Z]+/g
+                        );
+
+                    text =
+                        e ? e.join('\n') : '';
+
+                    break;
+
+
+                case 'reverseText':
+
+                    text =
+                        text
+                            .split('')
+                            .reverse()
+                            .join('');
+
+                    break;
+
+
+                case 'removeLinks':
+
+                    text =
+                        text.replace(
+                            /(?:https?:\/\/|www\.)[^\s]+/gi,
+                            ''
+                        );
+
+                    break;
+
+
+                case 'removeAIReferences':
+
+                    text =
+                        text.replace(
+                            /\[\[[\s\S]*?\]\]/g,
+                            ''
+                        );
+
+                    break;
+            }
+
+
+            outputArea.value = text;
+
+            outputCount.innerText =
+                `${text.length} อักษร`;
+
+            saveState(text);
+        }
+
+
+        /* ====================================================== */
+        /* ระบบบันทึกไฟล์ (เพิ่ม prompt ให้กรอกชื่อไฟล์) */
+        /* ====================================================== */
+
+        function saveDocument() {
+
+            const text =
+                outputArea.value;
+
+            const format =
+                document.getElementById(
+                    'document-format'
+                ).value;
+
+            if (!text.trim()) {
+
+                alert(
+                    'ไม่มีข้อความในช่องแสดงผลลัพธ์สำหรับบันทึก'
+                );
+
+                return;
+            }
+
+            const defaultName = "TheMuiZ_Document";
+            let baseName = defaultName;
+
+            // ใช้ prompt ถ้ามี (ในบาง WebView อาจไม่รองรับ)
+            if (typeof prompt === 'function') {
+                const userInput = prompt(
+                    "กรอกชื่อไฟล์ (ไม่ต้องใส่นามสกุล):",
+                    defaultName
+                );
+
+                // ผู้ใช้กด Cancel
+                if (userInput === null) return;
+
+                const trimmed = userInput.trim();
+                if (trimmed !== "") {
+                    baseName = trimmed;
+                }
+            }
+
+            const fileName = `${baseName}.${format}`;
+
+
+            if (format === 'txt') {
+
+                downloadBlob(
+                    text,
+                    'text/plain;charset=utf-8',
+                    fileName
+                );
 
             }
 
-        }
 
+            else if (format === 'md') {
 
-        switch(action) {
+                downloadBlob(
+                    text,
+                    'text/markdown;charset=utf-8',
+                    fileName
+                );
 
+            }
 
-            case 'removeAllSymbols':
 
-                text =
-                    text.replace(
-                        /[^\p{L}\p{M}\p{N}\s]/gu,
-                        ''
-                    );
+            else if (format === 'csv') {
 
-                break;
+                downloadBlob(
+                    '\uFEFF' + text,
+                    'text/csv;charset=utf-8',
+                    fileName
+                );
 
+            }
 
-            case 'removeSymbolsKeepBasic':
 
-                text =
-                    text.replace(
-                        /[^\p{L}\p{M}\p{N}\s.,!?"'\-()]/gu,
-                        ''
-                    );
+            else if (format === 'html') {
 
-                break;
-
-
-            case 'removeNumbers':
-
-                text =
-                    text.replace(
-                        /[0-9๐-๙]/g,
-                        ''
-                    );
-
-                break;
-
-
-            case 'removeEnglish':
-
-                text =
-                    text.replace(
-                        /[a-zA-Z]/g,
-                        ''
-                    );
-
-                break;
-
-
-            case 'toThaiNumbers':
-
-                text =
-                    text.replace(
-                        /[0-9]/g,
-                        m =>
-                            ({
-                                '0':'๐',
-                                '1':'๑',
-                                '2':'๒',
-                                '3':'๓',
-                                '4':'๔',
-                                '5':'๕',
-                                '6':'๖',
-                                '7':'๗',
-                                '8':'๘',
-                                '9':'๙'
-                            })[m]
-                    );
-
-                break;
-
-
-            case 'toArabicNumbers':
-
-                text =
-                    text.replace(
-                        /[๐-๙]/g,
-                        m =>
-                            ({
-                                '๐':'0',
-                                '๑':'1',
-                                '๒':'2',
-                                '๓':'3',
-                                '๔':'4',
-                                '๕':'5',
-                                '๖':'6',
-                                '๗':'7',
-                                '๘':'8',
-                                '๙':'9'
-                            })[m]
-                    );
-
-                break;
-
-
-            case 'upperCaseEng':
-
-                text =
-                    text.replace(
-                        /[a-z]/g,
-                        m => m.toUpperCase()
-                    );
-
-                break;
-
-
-            case 'lowerCaseEng':
-
-                text =
-                    text.replace(
-                        /[A-Z]/g,
-                        m => m.toLowerCase()
-                    );
-
-                break;
-
-
-            case 'capitalizeEng':
-
-                text =
-                    text.replace(
-                        /\b[a-zA-Z]/g,
-                        m => m.toUpperCase()
-                    );
-
-                break;
-
-
-            case 'removeSpaces':
-
-                text =
-                    text.replace(
-                        /[ \t]+/g,
-                        ''
-                    );
-
-                break;
-
-
-            case 'removeNewlines':
-
-                text =
-                    text.replace(
-                        /[\r\n]+/g,
-                        ''
-                    );
-
-                break;
-
-
-            case 'removeDuplicateSpaces':
-
-                text =
-                    text.replace(
-                        /[ \t]{2,}/g,
-                        ' '
-                    );
-
-                break;
-
-
-            case 'removeDuplicateLines':
-
-                text =
-                    text.replace(
-                        /(\r?\n){2,}/g,
-                        '\n'
-                    );
-
-                break;
-
-
-            case 'extractNumbers':
-
-                const n =
-                    text.match(
-                        /[0-9๐-๙]+/g
-                    );
-
-                text =
-                    n ? n.join('\n') : '';
-
-                break;
-
-
-            case 'extractThai':
-
-                const t =
-                    text.match(
-                        /[ก-๙]+/g
-                    );
-
-                text =
-                    t ? t.join('\n') : '';
-
-                break;
-
-
-            case 'extractEnglish':
-
-                const e =
-                    text.match(
-                        /[a-zA-Z]+/g
-                    );
-
-                text =
-                    e ? e.join('\n') : '';
-
-                break;
-
-
-            case 'reverseText':
-
-                text =
-                    text
-                        .split('')
-                        .reverse()
-                        .join('');
-
-                break;
-
-
-            case 'removeLinks':
-
-                text =
-                    text.replace(
-                        /(?:https?:\/\/|www\.)[^\s]+/gi,
-                        ''
-                    );
-
-                break;
-
-
-            case 'removeAIReferences':
-
-                text =
-                    text.replace(
-                        /\[\[[\s\S]*?\]\]/g,
-                        ''
-                    );
-
-                break;
-
-        }
-
-
-        outputArea.value =
-            text;
-
-
-        outputCount.innerText =
-            `${text.length} อักษร`;
-
-
-        saveState(text);
-
-    }
-
-
-    /* ========================================================= */
-    /* File Save System */
-    /* ========================================================= */
-
-
-    const FILE_TYPES = {
-
-        txt: {
-            mime: 'text/plain',
-            description: 'Text File',
-            extension: '.txt'
-        },
-
-        md: {
-            mime: 'text/markdown',
-            description: 'Markdown File',
-            extension: '.md'
-        },
-
-        csv: {
-            mime: 'text/csv',
-            description: 'CSV File',
-            extension: '.csv'
-        },
-
-        html: {
-            mime: 'text/html',
-            description: 'HTML File',
-            extension: '.html'
-        },
-
-        json: {
-            mime: 'application/json',
-            description: 'JSON File',
-            extension: '.json'
-        },
-
-        xml: {
-            mime: 'application/xml',
-            description: 'XML File',
-            extension: '.xml'
-        },
-
-        pdf: {
-            mime: 'application/pdf',
-            description: 'PDF File',
-            extension: '.pdf'
-        }
-
-    };
-
-
-    /* ========================================================= */
-    /* Clean filename */
-    /* ========================================================= */
-
-    function sanitizeFileName(name) {
-
-        return name
-            .trim()
-            .replace(
-                /[<>:"/\\|?*\u0000-\u001F]/g,
-                '_'
-            )
-            .replace(
-                /\s+/g,
-                ' '
-            )
-            .replace(
-                /\.+$/,
-                ''
-            );
-
-    }
-
-
-    /* ========================================================= */
-    /* Ensure Extension */
-    /* ========================================================= */
-
-    function ensureExtension(
-        name,
-        format
-    ) {
-
-        const extension =
-            FILE_TYPES[format].extension;
-
-        if (
-            name
-                .toLowerCase()
-                .endsWith(
-                    extension
-                )
-        ) {
-
-            return name;
-
-        }
-
-        return name + extension;
-
-    }
-
-
-    /* ========================================================= */
-    /* Create document content */
-    /* ========================================================= */
-
-    function createTextBlob(
-        text,
-        format,
-        defaultName
-    ) {
-
-
-        if (format === 'txt') {
-
-            return new Blob(
-                [text],
-                {
-                    type:
-                        'text/plain;charset=utf-8'
-                }
-            );
-
-        }
-
-
-        if (format === 'md') {
-
-            return new Blob(
-                [text],
-                {
-                    type:
-                        'text/markdown;charset=utf-8'
-                }
-            );
-
-        }
-
-
-        if (format === 'csv') {
-
-            return new Blob(
-                ['\uFEFF' + text],
-                {
-                    type:
-                        'text/csv;charset=utf-8'
-                }
-            );
-
-        }
-
-
-        if (format === 'html') {
-
-            const htmlContent =
+                const htmlContent =
 `<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(defaultName)}</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    padding: 30px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-</style>
+<title>${baseName}</title>
 </head>
-<body>${escapeHtml(text)}</body>
+<body>
+<pre>${escapeHtml(text)}</pre>
+</body>
 </html>`;
 
-
-            return new Blob(
-                [htmlContent],
-                {
-                    type:
-                        'text/html;charset=utf-8'
-                }
-            );
-
-        }
-
-
-        if (format === 'json') {
-
-            const jsonContent =
-                JSON.stringify(
-                    {
-                        source: 'TheMuiZ',
-                        title: defaultName,
-                        content: text
-                    },
-                    null,
-                    2
+                downloadBlob(
+                    htmlContent,
+                    'text/html;charset=utf-8',
+                    fileName
                 );
+            }
 
 
-            return new Blob(
-                [jsonContent],
-                {
-                    type:
-                        'application/json;charset=utf-8'
-                }
-            );
+            else if (format === 'json') {
 
-        }
-
-
-        if (format === 'xml') {
-
-            const safeText =
-                text
-                    .replace(
-                        /\]\]>/g,
-                        ']]]]><![CDATA[>'
+                const jsonContent =
+                    JSON.stringify(
+                        {
+                            source: 'TheMuiZ',
+                            title: baseName,
+                            content: text
+                        },
+                        null,
+                        2
                     );
 
+                downloadBlob(
+                    jsonContent,
+                    'application/json;charset=utf-8',
+                    fileName
+                );
+            }
 
-            const xmlContent =
+
+            else if (format === 'xml') {
+
+                const xmlContent =
 `<?xml version="1.0" encoding="UTF-8"?>
 <document>
     <source>TheMuiZ</source>
-    <title>${escapeXml(defaultName)}</title>
+    <title>${baseName}</title>
     <content><![CDATA[
-${safeText}
+${text}
     ]]></content>
 </document>`;
 
-
-            return new Blob(
-                [xmlContent],
-                {
-                    type:
-                        'application/xml;charset=utf-8'
-                }
-            );
-
-        }
-
-
-        return null;
-
-    }
-
-
-    /* ========================================================= */
-    /* Create PDF Blob */
-    /* ========================================================= */
-
-    function createPDFBlob(text) {
-
-        if (
-            !window.jspdf ||
-            !window.jspdf.jsPDF
-        ) {
-
-            throw new Error(
-                'ไม่พบระบบสร้าง PDF'
-            );
-
-        }
-
-
-        const {
-            jsPDF
-        } = window.jspdf;
-
-
-        const doc =
-            new jsPDF();
-
-
-        const pageWidth =
-            doc.internal.pageSize.getWidth();
-
-
-        const pageHeight =
-            doc.internal.pageSize.getHeight();
-
-
-        const margin = 15;
-
-
-        const maxWidth =
-            pageWidth -
-            (margin * 2);
-
-
-        doc.setFont(
-            'helvetica',
-            'normal'
-        );
-
-
-        doc.setFontSize(12);
-
-
-        const lines =
-            doc.splitTextToSize(
-                text,
-                maxWidth
-            );
-
-
-        let y = 20;
-
-        const lineHeight = 7;
-
-
-        lines.forEach(
-            line => {
-
-                if (
-                    y >
-                    pageHeight - 20
-                ) {
-
-                    doc.addPage();
-
-                    y = 20;
-
-                }
-
-
-                doc.text(
-                    line,
-                    margin,
-                    y
+                downloadBlob(
+                    xmlContent,
+                    'application/xml;charset=utf-8',
+                    fileName
                 );
-
-
-                y += lineHeight;
-
-            }
-        );
-
-
-        return doc.output(
-            'blob'
-        );
-
-    }
-
-
-    /* ========================================================= */
-    /* Generate final Blob */
-    /* ========================================================= */
-
-    function createDocumentBlob(
-        text,
-        format,
-        defaultName
-    ) {
-
-        if (
-            format === 'pdf'
-        ) {
-
-            return createPDFBlob(
-                text
-            );
-
-        }
-
-
-        return createTextBlob(
-            text,
-            format,
-            defaultName
-        );
-
-    }
-
-
-    /* ========================================================= */
-    /* Native Save Picker */
-    /* ========================================================= */
-
-    async function saveWithNativePicker(
-        blob,
-        fileName,
-        format
-    ) {
-
-        if (
-            typeof window.showSaveFilePicker !==
-            'function'
-        ) {
-
-            return false;
-
-        }
-
-
-        const type =
-            FILE_TYPES[format];
-
-
-        try {
-
-            /*
-             * IMPORTANT:
-             *
-             * showSaveFilePicker()
-             * ต้องถูกเรียกจากการกดปุ่ม
-             * โดยตรงเพื่อรักษา user activation
-             */
-
-            const fileHandle =
-                await window.showSaveFilePicker({
-
-                    suggestedName:
-                        fileName,
-
-                    startIn:
-                        'downloads',
-
-                    types: [
-
-                        {
-
-                            description:
-                                type.description,
-
-                            accept: {
-
-                                [type.mime]:
-                                    [type.extension]
-
-                            }
-
-                        }
-
-                    ]
-
-                });
-
-
-            const writable =
-                await fileHandle.createWritable();
-
-
-            await writable.write(
-                blob
-            );
-
-
-            await writable.close();
-
-
-            return true;
-
-
-        } catch (error) {
-
-            /*
-             * ผู้ใช้กดยกเลิก
-             */
-
-            if (
-                error &&
-                error.name === 'AbortError'
-            ) {
-
-                return true;
-
             }
 
 
-            console.error(
-                'Native Save Picker Error:',
-                error
-            );
+            else if (format === 'pdf') {
 
-
-            return false;
-
+                saveAsPDF(text, fileName);
+            }
         }
 
-    }
 
-
-    /* ========================================================= */
-    /* Fallback Save */
-    /* ========================================================= */
-
-    async function saveWithFallback(
-        blob,
-        defaultFileName
-    ) {
-
-        /*
-         * ถ้า WebView ไม่รองรับ
-         * showSaveFilePicker()
-         * ให้ถามชื่อไฟล์ก่อน
-         */
-
-        let requestedName =
-            window.prompt(
-                'กรอกชื่อไฟล์ที่ต้องการบันทึก',
-                defaultFileName
-            );
-
-
-        if (
-            requestedName === null
+        function downloadBlob(
+            content,
+            type,
+            fileName
         ) {
-
-            return false;
-
-        }
-
-
-        requestedName =
-            sanitizeFileName(
-                requestedName
-            );
-
-
-        if (
-            !requestedName
-        ) {
-
-            requestedName =
-                defaultFileName;
-
-        }
-
-
-        const finalName =
-            requestedName;
-
-
-        const url =
-            URL.createObjectURL(
-                blob
-            );
-
-
-        const link =
-            document.createElement('a');
-
-
-        link.href =
-            url;
-
-
-        link.download =
-            finalName;
-
-
-        link.style.display =
-            'none';
-
-
-        document.body.appendChild(
-            link
-        );
-
-
-        link.click();
-
-
-        document.body.removeChild(
-            link
-        );
-
-
-        setTimeout(
-            () => {
-
-                URL.revokeObjectURL(
-                    url
+            
+            const blob =
+                new Blob(
+                    [content],
+                    { type: type }
                 );
 
-            },
-            1000
-        );
+            const url =
+                URL.createObjectURL(blob);
 
 
-        return true;
+            const link =
+                document.createElement('a');
 
-    }
+            link.href = url;
 
+            link.download =
+                fileName;
 
-    /* ========================================================= */
-    /* MAIN SAVE FUNCTION */
-    /* ========================================================= */
+            document.body.appendChild(link);
 
-    async function saveDocument() {
+            link.click();
 
-        const text =
-            outputArea.value;
+            document.body.removeChild(link);
 
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 100);
 
-        const format =
-            document.getElementById(
-                'document-format'
-            ).value;
-
-
-        if (
-            !text.trim()
-        ) {
-
-            alert(
-                'ไม่มีข้อความในช่องแสดงผลลัพธ์สำหรับบันทึก'
-            );
-
-            return;
-
+            showSaveToast();
         }
 
 
-        const defaultBaseName =
-            'TheMuiZ_Document';
+        function saveAsPDF(text, fileName) {
+
+            const {
+                jsPDF
+            } = window.jspdf;
+
+            const doc =
+                new jsPDF();
 
 
-        const defaultFileName =
-            defaultBaseName +
-            FILE_TYPES[format].extension;
+            const pageWidth =
+                doc.internal.pageSize.getWidth();
+
+            const margin = 15;
+
+            const maxWidth =
+                pageWidth -
+                (margin * 2);
 
 
-        try {
+            doc.setFont(
+                'helvetica',
+                'normal'
+            );
 
-            /*
-             * =================================================
-             * 1. รองรับ Native File Picker
-             * =================================================
-             *
-             * ใช้ก่อนเสมอ
-             */
-
-            if (
-                typeof window.showSaveFilePicker ===
-                'function'
-            ) {
-
-                /*
-                 * เปิดหน้าต่าง Save ก่อน
-                 * เพื่อไม่ให้ user activation หาย
-                 */
-
-                let fileHandle;
+            doc.setFontSize(12);
 
 
-                try {
+            const lines =
+                doc.splitTextToSize(
+                    text,
+                    maxWidth
+                );
 
-                    const type =
-                        FILE_TYPES[format];
+
+            let y = 20;
+
+            const lineHeight = 7;
 
 
-                    fileHandle =
-                        await window.showSaveFilePicker({
+            lines.forEach(
+                line => {
 
-                            suggestedName:
-                                defaultFileName,
+                    if (y > 280) {
 
-                            startIn:
-                                'downloads',
+                        doc.addPage();
 
-                            types: [
-
-                                {
-
-                                    description:
-                                        type.description,
-
-                                    accept: {
-
-                                        [type.mime]:
-                                            [type.extension]
-
-                                    }
-
-                                }
-
-                            ]
-
-                        });
-
-                } catch (error) {
-
-                    /*
-                     * ผู้ใช้กดยกเลิก
-                     */
-
-                    if (
-                        error &&
-                        error.name === 'AbortError'
-                    ) {
-
-                        return;
-
+                        y = 20;
                     }
 
-
-                    throw error;
-
-                }
-
-
-                /*
-                 * สร้างไฟล์หลังจากได้
-                 * fileHandle แล้ว
-                 */
-
-                const blob =
-                    createDocumentBlob(
-                        text,
-                        format,
-                        defaultBaseName
+                    doc.text(
+                        line,
+                        margin,
+                        y
                     );
 
-
-                const writable =
-                    await fileHandle.createWritable();
-
-
-                await writable.write(
-                    blob
-                );
-
-
-                await writable.close();
-
-
-                showSaveToast(
-                    'บันทึกไฟล์สำเร็จ!'
-                );
-
-
-                return;
-
-            }
-
-
-            /*
-             * =================================================
-             * 2. Fallback สำหรับ WebView เก่า
-             * =================================================
-             */
-
-            let blob =
-                createDocumentBlob(
-                    text,
-                    format,
-                    defaultBaseName
-                );
-
-
-            await saveWithFallback(
-                blob,
-                defaultFileName
+                    y += lineHeight;
+                }
             );
 
-
-            showSaveToast(
-                'ส่งไฟล์ไปยังระบบดาวน์โหลดแล้ว'
+            
+            doc.save(
+                fileName
             );
 
-
-        } catch (error) {
-
-            console.error(
-                'Save Error:',
-                error
-            );
-
-
-            alert(
-                'ไม่สามารถบันทึกไฟล์ได้\n\n' +
-                'รายละเอียด: ' +
-                (
-                    error.message ||
-                    error
-                )
-            );
-
+            showSaveToast();
         }
 
-    }
+
+        function escapeHtml(text) {
+
+            return text
+                .replace(
+                    /&/g,
+                    '&amp;'
+                )
+                .replace(
+                    /</g,
+                    '&lt;'
+                )
+                .replace(
+                    />/g,
+                    '&gt;'
+                )
+                .replace(
+                    /"/g,
+                    '&quot;'
+                )
+                .replace(
+                    /'/g,
+                    '&#039;'
+                );
+        }
 
 
-    /* ========================================================= */
-    /* XML escape */
-    /* ========================================================= */
+        function showSaveToast() {
 
-    function escapeXml(text) {
+            toast.innerText =
+                'บันทึกไฟล์สำเร็จ!';
 
-        return text
-            .replace(
-                /&/g,
-                '&amp;'
-            )
-            .replace(
-                /</g,
-                '&lt;'
-            )
-            .replace(
-                />/g,
-                '&gt;'
-            )
-            .replace(
-                /"/g,
-                '&quot;'
-            )
-            .replace(
-                /'/g,
-                '&apos;'
+            toast.className =
+                "show";
+
+
+            setTimeout(
+                () => {
+
+                    toast.className = "";
+
+                    toast.innerText =
+                        "คัดลอกข้อความสำเร็จ!";
+
+                },
+                2000
             );
+        }
 
-    }
-
-
-    /* ========================================================= */
-    /* HTML escape */
-    /* ========================================================= */
-
-    function escapeHtml(text) {
-
-        return text
-            .replace(
-                /&/g,
-                '&amp;'
-            )
-            .replace(
-                /</g,
-                '&lt;'
-            )
-            .replace(
-                />/g,
-                '&gt;'
-            )
-            .replace(
-                /"/g,
-                '&quot;'
-            )
-            .replace(
-                /'/g,
-                '&#039;'
-            );
-
-    }
-
-
-    /* ========================================================= */
-    /* Toast */
-    /* ========================================================= */
-
-    function showSaveToast(
-        message = 'บันทึกไฟล์สำเร็จ!'
-    ) {
-
-        toast.innerText =
-            message;
-
-        toast.className =
-            'show';
-
-
-        setTimeout(
-            () => {
-
-                toast.className =
-                    '';
-
-            },
-            2500
-        );
-
-    }
-
-
-    /* ========================================================= */
-    /* ตรวจสอบระบบบันทึก */
-    /* ========================================================= */
-
-    function checkFileSaveSupport() {
-
-        const supported =
-            typeof window.showSaveFilePicker ===
-            'function';
-
-
-        console.log(
-            'TheMuiZ File Save API:',
-            supported
-                ? 'Native Save Picker รองรับ'
-                : 'ใช้ระบบ Fallback'
-        );
-
-    }
-
-
-    checkFileSaveSupport();
-
-</script>
-
+    </script>
 </body>
 </html>
