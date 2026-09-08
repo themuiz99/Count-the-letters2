@@ -961,7 +961,7 @@
 
 
         /* ====================================================== */
-        /* ระบบบันทึกไฟล์ (เพิ่ม prompt ให้กรอกชื่อไฟล์) */
+        /* ระบบบันทึกไฟล์ (เอาหน้าต่าง Prompt ออก เซฟอัตโนมัติทันที) */
         /* ====================================================== */
 
         function saveDocument() {
@@ -984,25 +984,7 @@
             }
 
             const defaultName = "TheMuiZ_Document";
-            let baseName = defaultName;
-
-            // ใช้ prompt ถ้ามี (ในบาง WebView อาจไม่รองรับ)
-            if (typeof prompt === 'function') {
-                const userInput = prompt(
-                    "กรอกชื่อไฟล์ (ไม่ต้องใส่นามสกุล):",
-                    defaultName
-                );
-
-                // ผู้ใช้กด Cancel
-                if (userInput === null) return;
-
-                const trimmed = userInput.trim();
-                if (trimmed !== "") {
-                    baseName = trimmed;
-                }
-            }
-
-            const fileName = `${baseName}.${format}`;
+            const fileName = `${defaultName}.${format}`;
 
 
             if (format === 'txt') {
@@ -1045,7 +1027,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>${baseName}</title>
+<title>${defaultName}</title>
 </head>
 <body>
 <pre>${escapeHtml(text)}</pre>
@@ -1066,7 +1048,7 @@
                     JSON.stringify(
                         {
                             source: 'TheMuiZ',
-                            title: baseName,
+                            title: defaultName,
                             content: text
                         },
                         null,
@@ -1087,7 +1069,7 @@
 `<?xml version="1.0" encoding="UTF-8"?>
 <document>
     <source>TheMuiZ</source>
-    <title>${baseName}</title>
+    <title>${defaultName}</title>
     <content><![CDATA[
 ${text}
     ]]></content>
@@ -1266,3 +1248,4 @@ ${text}
     </script>
 </body>
 </html>
+
