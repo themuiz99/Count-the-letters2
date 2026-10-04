@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TheMuiZ เครื่องมือจัดการตัวอักษร</title>
+    <title>TheMuiZ เครื่องมือจัดการตัวอักษร & อ่านออกเสียง</title>
     <link href="https://fonts.googleapis.com/css2?family=Pattaya&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
-
-    <!-- เพิ่มเฉพาะส่วนสำหรับสร้าง PDF -->
+    
+    <!-- Script สำหรับ PDF และเสียงพากย์ผู้หญิง -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script id="voice-female" src="https://code.responsivevoice.org/responsivevoice.js?key=Negu9VLC"></script>
 
     <style>
         :root {
@@ -206,6 +207,7 @@
             text-align: center;
             border-bottom: 1px solid var(--border);
             padding-bottom: 2px;
+            margin-top: 4px;
         }
 
         .tools-grid {
@@ -217,7 +219,7 @@
         .tool-btn {
             color: #fff;
             border: 1px solid transparent;
-            padding: 4px 2px;
+            padding: 5px 2px;
             border-radius: 4px;
             font-size: 11px;
             cursor: pointer;
@@ -225,30 +227,35 @@
             text-align: center;
         }
 
+        .tool-btn:hover {
+            filter: brightness(1.1);
+        }
+
         .btn-c1 { background: #b71c1c; }
         .btn-c2 { background: #c62828; }
         .btn-c3 { background: #d84315; }
         .btn-c4 { background: #ef6c00; }
-
         .btn-c5 { background: #f9a825; }
         .btn-c6 { background: #9e9d24; }
         .btn-c7 { background: #558b2f; }
         .btn-c8 { background: #00695c; }
-
         .btn-c9 { background: #00838f; }
         .btn-c10 { background: #0277bd; }
         .btn-c11 { background: #1565c0; }
         .btn-c12 { background: #283593; }
-
         .btn-c13 { background: #4527a0; }
         .btn-c14 { background: #6a1b9a; }
         .btn-c15 { background: #ad1457; }
         .btn-c16 { background: #4e342e; }
-
         .btn-c17 { background: #bf360c; }
         .btn-c18 { background: #7b1fa2; }
         .btn-c19 { background: #004d40; }
         .btn-c20 { background: #01579b; }
+
+        /* สีพิเศษสำหรับปุ่มดาวน์โหลดและเล่นเสียง */
+        .btn-play { background: #7c3aed; }
+        .btn-pause { background: #4b5563; }
+        .btn-download-mp3 { background: #10b981; position: relative; overflow: hidden; }
 
         .footer {
             text-align: center;
@@ -272,16 +279,13 @@
             opacity: 0;
             transition: opacity 0.3s;
             font-size: 12px;
+            z-index: 999;
         }
 
         #toast.show {
             visibility: visible;
             opacity: 1;
         }
-
-        /* ============================= */
-        /* เพิ่มเฉพาะส่วนปุ่มบันทึกไฟล์ */
-        /* ============================= */
 
         .save-document-section {
             display: flex;
@@ -314,30 +318,38 @@
         .btn-save-document:hover {
             background: #1976d2 !important;
         }
+
+        .loader { 
+            width: 12px; height: 12px; 
+            border: 2px solid rgba(255,255,255,0.2); 
+            border-top-color: #bb86fc; 
+            border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 
 <body>
+    <!-- Audio สำหรับเล่นพื้นหลัง -->
+    <audio id="persistentAudio" preload="auto" playsinline webkit-playsinline></audio>
 
     <div class="header">
         <h1 class="site-title">TheMuiZ</h1>
-        <div class="site-subtitle">เครื่องมือจัดการตัวอักษร</div>
+        <div class="site-subtitle">เครื่องมือจัดการตัวอักษร & อ่านออกเสียง</div>
     </div>
 
     <div class="workspace">
-
         <div class="text-section">
-
             <div class="box-container">
                 <div class="box-header">
                     <span>ช่องกรอกข้อมูล</span>
-
                     <div class="btn-group-small">
                         <button onclick="undo()" class="btn-undo">ย้อนกลับ</button>
                         <button onclick="clearText()" class="btn-danger">ล้างข้อความ</button>
                     </div>
                 </div>
-
                 <div class="textarea-wrapper">
                     <textarea id="input-text"></textarea>
                     <div id="input-count" class="char-count">0 อักษร</div>
@@ -346,30 +358,15 @@
 
             <div class="custom-remove-sec">
                 <span>ลบเฉพาะตัว:</span>
-                <input
-                    type="text"
-                    id="custom-remove-input"
-                    placeholder="a,b,ก (คั่นด้วย ,)"
-                >
+                <input type="text" id="custom-remove-input" placeholder="a,b,ก (คั่นด้วย ,)">
             </div>
 
             <div class="box-container">
                 <div class="box-header">
-                    <span>ช่องแสดงผลลัพธ์</span>
-
+                    <span>ช่องแสดงผลลัพธ์ (ใช้อ่านออกเสียง)</span>
                     <div class="save-document-section">
-
-                        <button
-                            onclick="copyOutput()"
-                            class="btn-success"
-                        >
-                            คัดลอกข้อความ
-                        </button>
-
-                        <select
-                            id="document-format"
-                            title="เลือกรูปแบบไฟล์"
-                        >
+                        <button onclick="copyOutput()" class="btn-success">คัดลอกข้อความ</button>
+                        <select id="document-format" title="เลือกรูปแบบไฟล์">
                             <option value="txt">TXT</option>
                             <option value="md">MD</option>
                             <option value="csv">CSV</option>
@@ -378,340 +375,366 @@
                             <option value="xml">XML</option>
                             <option value="pdf">PDF</option>
                         </select>
-
-                        <button
-                            onclick="saveDocument()"
-                            class="btn-save-document"
-                        >
-                            บันทึกไฟล์
-                        </button>
-
+                        <button onclick="saveDocument()" class="btn-save-document">บันทึกไฟล์</button>
                     </div>
                 </div>
-
                 <div class="textarea-wrapper">
-                    <textarea
-                        id="output-text"
-                        readonly
-                    ></textarea>
-
-                    <div
-                        id="output-count"
-                        class="char-count"
-                    >
-                        0 อักษร
-                    </div>
+                    <textarea id="output-text" readonly></textarea>
+                    <div id="output-count" class="char-count">0 อักษร</div>
                 </div>
             </div>
         </div>
 
         <div class="tools-section">
-
-            <div class="tools-title">
-                เครื่องมือจัดการ
+            <!-- หมวดหมู่อ่านออกเสียง (TTS) -->
+            <div class="tools-title">เครื่องมืออ่านออกเสียง (MP3)</div>
+            <div class="tools-grid" style="margin-bottom: 5px;">
+                <button id="ttsPlay" class="tool-btn btn-play">🔊 อ่านออกเสียง</button>
+                <button id="ttsPause" class="tool-btn btn-pause">⏸️ หยุด / ต่อ</button>
+                <button id="ttsDownload" class="tool-btn btn-download-mp3" style="grid-column: span 2;">
+                    <span id="downloadText">💾 บันทึกไฟล์เสียง MP3</span>
+                    <div id="downloadProgress" style="position: absolute; left: 0; bottom: 0; height: 3px; background: rgba(255,255,255,0.8); width: 0%; transition: all 0.3s;"></div>
+                </button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 11px; color: var(--text-muted);">
+                <div id="ttsLoader" class="loader" style="margin-right: 6px;"></div>
+                <span id="ttsStatus">พร้อมใช้งาน (ใช้เสียงผู้หญิงมาตรฐาน)</span>
             </div>
 
+            <!-- หมวดหมู่จัดการข้อความ -->
+            <div class="tools-title">เครื่องมือจัดการข้อความ</div>
             <div class="tools-grid">
-
-                <button
-                    class="tool-btn btn-c1"
-                    onclick="applyTool('removeAllSymbols')"
-                >
-                    ลบสัญลักษณ์ทั้งหมด
-                </button>
-
-                <button
-                    class="tool-btn btn-c2"
-                    onclick="applyTool('removeSymbolsKeepBasic')"
-                >
-                    ลบสัญลักษณ์พื้นฐาน
-                </button>
-
-                <button
-                    class="tool-btn btn-c3"
-                    onclick="applyTool('removeNumbers')"
-                >
-                    ลบตัวเลขทั้งหมด
-                </button>
-
-                <button
-                    class="tool-btn btn-c18"
-                    onclick="applyTool('removeEnglish')"
-                >
-                    ลบภาษาอังกฤษ
-                </button>
-
-                <button
-                    class="tool-btn btn-c4"
-                    onclick="applyTool('toThaiNumbers')"
-                >
-                    เปลี่ยนเป็นเลขไทย
-                </button>
-
-                <button
-                    class="tool-btn btn-c5"
-                    onclick="applyTool('toArabicNumbers')"
-                >
-                    เปลี่ยนเป็นอารบิก
-                </button>
-
-                <button
-                    class="tool-btn btn-c6"
-                    onclick="applyTool('upperCaseEng')"
-                >
-                    EN พิมพ์ใหญ่
-                </button>
-
-                <button
-                    class="tool-btn btn-c7"
-                    onclick="applyTool('lowerCaseEng')"
-                >
-                    EN พิมพ์เล็ก
-                </button>
-
-                <button
-                    class="tool-btn btn-c8"
-                    onclick="applyTool('capitalizeEng')"
-                    style="grid-column: span 2;"
-                >
-                    EN ขึ้นต้นพิมพ์ใหญ่
-                </button>
-
-                <button
-                    class="tool-btn btn-c9"
-                    onclick="applyTool('removeSpaces')"
-                >
-                    ลบเว้นวรรค
-                </button>
-
-                <button
-                    class="tool-btn btn-c10"
-                    onclick="applyTool('removeNewlines')"
-                >
-                    ลบขึ้นบรรทัดใหม่
-                </button>
-
-                <button
-                    class="tool-btn btn-c11"
-                    onclick="applyTool('removeDuplicateSpaces')"
-                >
-                    ลบเว้นวรรคซ้ำ
-                </button>
-
-                <button
-                    class="tool-btn btn-c12"
-                    onclick="applyTool('removeDuplicateLines')"
-                >
-                    ลบบรรทัดซ้ำ
-                </button>
-
-                <button
-                    class="tool-btn btn-c13"
-                    onclick="applyTool('extractNumbers')"
-                >
-                    ดึงเฉพาะตัวเลข
-                </button>
-
-                <button
-                    class="tool-btn btn-c14"
-                    onclick="applyTool('extractThai')"
-                >
-                    ดึงเฉพาะภาษาไทย
-                </button>
-
-                <button
-                    class="tool-btn btn-c15"
-                    onclick="applyTool('extractEnglish')"
-                >
-                    ดึงเฉพาะภาษาอังกฤษ
-                </button>
-
-                <button
-                    class="tool-btn btn-c16"
-                    onclick="applyTool('reverseText')"
-                >
-                    กลับหลังหันข้อความ
-                </button>
-
-                <button
-                    class="tool-btn btn-c17"
-                    onclick="applyTool('removeLinks')"
-                >
-                    ลบลิงก์ (URL)
-                </button>
-
-                <button
-                    class="tool-btn btn-c19"
-                    onclick="applyTool('removeAIReferences')"
-                >
-                    ลบแหล่งอ้างอิง AI
-                </button>
-
-                <button
-                    class="tool-btn btn-c20"
-                    onclick="applyTool('convertNumbersToThaiText')"
-                    style="grid-column: span 2;"
-                >
-                    แปลงเป็นตัวอักษรทั้งหมด
-                </button>
-
+                <button class="tool-btn btn-c1" onclick="applyTool('removeAllSymbols')">ลบสัญลักษณ์ทั้งหมด</button>
+                <button class="tool-btn btn-c2" onclick="applyTool('removeSymbolsKeepBasic')">ลบสัญลักษณ์พื้นฐาน</button>
+                <button class="tool-btn btn-c3" onclick="applyTool('removeNumbers')">ลบตัวเลขทั้งหมด</button>
+                <button class="tool-btn btn-c18" onclick="applyTool('removeEnglish')">ลบภาษาอังกฤษ</button>
+                <button class="tool-btn btn-c4" onclick="applyTool('toThaiNumbers')">เปลี่ยนเป็นเลขไทย</button>
+                <button class="tool-btn btn-c5" onclick="applyTool('toArabicNumbers')">เปลี่ยนเป็นอารบิก</button>
+                <button class="tool-btn btn-c6" onclick="applyTool('upperCaseEng')">EN พิมพ์ใหญ่</button>
+                <button class="tool-btn btn-c7" onclick="applyTool('lowerCaseEng')">EN พิมพ์เล็ก</button>
+                <button class="tool-btn btn-c8" onclick="applyTool('capitalizeEng')" style="grid-column: span 2;">EN ขึ้นต้นพิมพ์ใหญ่</button>
+                <button class="tool-btn btn-c9" onclick="applyTool('removeSpaces')">ลบเว้นวรรค</button>
+                <button class="tool-btn btn-c10" onclick="applyTool('removeNewlines')">ลบขึ้นบรรทัดใหม่</button>
+                <button class="tool-btn btn-c11" onclick="applyTool('removeDuplicateSpaces')">ลบเว้นวรรคซ้ำ</button>
+                <button class="tool-btn btn-c12" onclick="applyTool('removeDuplicateLines')">ลบบรรทัดซ้ำ</button>
+                <button class="tool-btn btn-c13" onclick="applyTool('extractNumbers')">ดึงเฉพาะตัวเลข</button>
+                <button class="tool-btn btn-c14" onclick="applyTool('extractThai')">ดึงเฉพาะภาษาไทย</button>
+                <button class="tool-btn btn-c15" onclick="applyTool('extractEnglish')">ดึงเฉพาะภาษาอังกฤษ</button>
+                <button class="tool-btn btn-c16" onclick="applyTool('reverseText')">กลับหลังหันข้อความ</button>
+                <button class="tool-btn btn-c17" onclick="applyTool('removeLinks')">ลบลิงก์ (URL)</button>
+                <button class="tool-btn btn-c19" onclick="applyTool('removeAIReferences')">ลบแหล่งอ้างอิง AI</button>
+                <button class="tool-btn btn-c20" onclick="applyTool('convertNumbersToThaiText')" style="grid-column: span 2;">แปลงเป็นตัวอักษรทั้งหมด</button>
             </div>
         </div>
     </div>
 
-    <div class="footer">
-        &copy; สงวนลิขสิทธิ์โดย TheMuiz
-    </div>
-
-    <div id="toast">
-        คัดลอกข้อความสำเร็จ!
-    </div>
+    <div class="footer">&copy; สงวนลิขสิทธิ์โดย TheMuiz × หนูมะลิ</div>
+    <div id="toast">คัดลอกข้อความสำเร็จ!</div>
 
     <script>
+        const inputArea = document.getElementById('input-text');
+        const outputArea = document.getElementById('output-text');
+        const customRemoveInput = document.getElementById('custom-remove-input');
+        const inputCount = document.getElementById('input-count');
+        const outputCount = document.getElementById('output-count');
+        const toast = document.getElementById('toast');
 
-        const inputArea =
-            document.getElementById('input-text');
-
-        const outputArea =
-            document.getElementById('output-text');
-
-        const customRemoveInput =
-            document.getElementById('custom-remove-input');
-
-        const inputCount =
-            document.getElementById('input-count');
-
-        const outputCount =
-            document.getElementById('output-count');
-
-        const toast =
-            document.getElementById('toast');
-
-
-        // เก็บประวัติผลลัพธ์เพื่อรองรับการ Undo ทุกย่างก้าว
         let outputHistory = [""];
 
-
         function saveState(text) {
-
-            // บันทึกเฉพาะเมื่อข้อความใหม่ไม่ซ้ำกับอันล่าสุด
-            if (
-                outputHistory[outputHistory.length - 1] !== text
-            ) {
+            if (outputHistory[outputHistory.length - 1] !== text) {
                 outputHistory.push(text);
             }
         }
 
-
         function undo() {
-
             if (outputHistory.length > 1) {
-
                 outputHistory.pop();
-
-                const previousState =
-                    outputHistory[outputHistory.length - 1];
-
+                const previousState = outputHistory[outputHistory.length - 1];
                 outputArea.value = previousState;
-
-                outputCount.innerText =
-                    `${outputArea.value.length} อักษร`;
+                outputCount.innerText = `${outputArea.value.length} อักษร`;
             }
         }
 
-
         function clearText() {
-
             outputHistory = [""];
-
             inputArea.value = "";
             outputArea.value = "";
-
             inputCount.innerText = "0 อักษร";
             outputCount.innerText = "0 อักษร";
         }
 
-
         function copyOutput() {
-
-            const t =
-                document.createElement('textarea');
-
+            const t = document.createElement('textarea');
             t.value = outputArea.value;
-
             document.body.appendChild(t);
-
             t.select();
-
             document.execCommand('copy');
-
             document.body.removeChild(t);
-
-            toast.innerText =
-                "คัดลอกข้อความสำเร็จ!";
-
+            toast.innerText = "คัดลอกข้อความสำเร็จ!";
             toast.className = "show";
+            setTimeout(() => toast.className = "", 2000);
+        }
 
-            setTimeout(
-                () => toast.className = "",
-                2000
-            );
+        function saveDocument() {
+            // ระบบบันทึกไฟล์ (ปรับจากต้นฉบับ)
+            const format = document.getElementById('document-format').value;
+            const text = outputArea.value;
+            if(!text) { alert('ไม่มีข้อความให้บันทึก'); return; }
+            const blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `TheMuiz_Document_${new Date().getTime()}.${format}`;
+            a.click();
         }
 
         // =========================================================
-        // ฟังก์ชันสำหรับแปลงตัวเลขเป็นคำอ่านภาษาไทย (นำมาจากโค้ดต้นฉบับที่ให้มา)
+        // ฟังก์ชันอ่านออกเสียงและบันทึก MP3
+        // =========================================================
+        const ttsPlay = document.getElementById('ttsPlay');
+        const ttsPause = document.getElementById('ttsPause');
+        const ttsDownload = document.getElementById('ttsDownload');
+        const downloadText = document.getElementById('downloadText');
+        const downloadProgress = document.getElementById('downloadProgress');
+        const ttsStatus = document.getElementById('ttsStatus');
+        const ttsLoader = document.getElementById('ttsLoader');
+        const persistentAudio = document.getElementById('persistentAudio');
+
+        let isPaused = false, currentTextArray = [], currentIndex = 0, isDownloading = false;
+        const apiKey = 'Negu9VLC'; // เสียงผู้หญิง
+
+        function setStatus(m, loading=false) {
+            ttsStatus.textContent = m;
+            ttsLoader.style.display = loading ? 'block' : 'none';
+        }
+
+        function filterTextToSpeak(text){ return text.replace(/[^ก-๙a-zA-Z0-9\s\n]/g,''); }
+
+        function buildTTSUrl(t) {
+            const clean = t.replace(/\s+/g,' ').trim();
+            // rate=1 เสมอ ตามที่ระบุให้ลบตัวปรับความเร็ว
+            return `https://code.responsivevoice.org/getvoice.php?t=${encodeURIComponent(clean)}&tl=th&sv=g2&vn=&pitch=0.5&rate=1&vol=1&key=${apiKey}&cf=mp3`;
+        }
+
+        function chunkText(t,m) {
+            const s=t.split(/([.!?。！？\n])/);
+            let c=[],cur='';
+            for(let p of s){
+                if((cur+p).length>m){
+                    if(cur.trim())c.push(cur.trim());
+                    if(p.length>m){
+                        let w=p.split(/(\s+)/),wc='';
+                        for(let x of w){
+                            if((wc+x).length>m){
+                                if(wc.trim())c.push(wc.trim());
+                                wc=x;
+                            }else wc+=x;
+                        }
+                        if(wc.trim())c.push(wc.trim());
+                        cur='';
+                    }else cur=p;
+                }else cur+=p;
+            }
+            if(cur.trim())c.push(cur.trim());
+            return c.filter(x=>x.length>0);
+        }
+
+        function stopSpeaking(reset=true) {
+            try{ if(typeof responsiveVoice!=='undefined') responsiveVoice.cancel(); }catch(e){}
+            persistentAudio.pause();
+            try{ persistentAudio.removeAttribute('src'); persistentAudio.load(); }catch(e){}
+            if('mediaSession' in navigator){ try{ navigator.mediaSession.playbackState='none'; }catch(e){} }
+            if(reset){ isPaused=false; currentIndex=0; }
+        }
+
+        function playFromIndex(i) {
+            if(i >= currentTextArray.length){
+                setStatus('อ่านจบแล้วค่ะ! 🎉');
+                isPaused = false; currentIndex = 0;
+                if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='none';}catch(e){}}
+                return;
+            }
+            currentIndex = i;
+            const textChunk = currentTextArray[currentIndex].replace(/\s+/g,' ').trim();
+            if(!textChunk){ playFromIndex(currentIndex+1); return; }
+
+            persistentAudio.src = buildTTSUrl(textChunk);
+            persistentAudio.load();
+
+            if('mediaSession' in navigator){
+                try {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: textChunk.substring(0,60) || 'TheMuiz อ่านออกเสียง',
+                        artist: 'TheMuiz',
+                        album: `กำลังอ่าน ${currentIndex+1}/${currentTextArray.length}`
+                    });
+                    navigator.mediaSession.playbackState = 'playing';
+                }catch(e){}
+            }
+            setStatus(`กำลังอ่าน... (${currentIndex+1}/${currentTextArray.length})`, true);
+            persistentAudio.play().catch(err=>{
+                setStatus('แตะปุ่มเล่นอีกครั้งเพื่อเล่นต่อค่ะ');
+            });
+        }
+
+        persistentAudio.addEventListener('ended', ()=>{ if(!isPaused) playFromIndex(currentIndex+1); });
+        persistentAudio.addEventListener('error', ()=>{ if(!isPaused) setTimeout(()=> playFromIndex(currentIndex+1), 700); });
+
+        if('mediaSession' in navigator){
+            try{
+                navigator.mediaSession.setActionHandler('play', ()=>{ if(isPaused){ isPaused=false; persistentAudio.play().catch(()=>{}); setStatus(`กำลังอ่านต่อ... (${currentIndex+1}/${currentTextArray.length})`, true); navigator.mediaSession.playbackState='playing'; }});
+                navigator.mediaSession.setActionHandler('pause', ()=>{ if(!persistentAudio.paused){ persistentAudio.pause(); isPaused=true; setStatus('หยุดพักแล้วค่ะ'); navigator.mediaSession.playbackState='paused'; }});
+                navigator.mediaSession.setActionHandler('stop', ()=>{ stopSpeaking(true); setStatus('หยุดแล้วค่ะ'); });
+                navigator.mediaSession.setActionHandler('nexttrack', ()=>{ if(currentIndex < currentTextArray.length-1) playFromIndex(currentIndex+1); });
+                navigator.mediaSession.setActionHandler('previoustrack', ()=>{ if(currentIndex>0) playFromIndex(currentIndex-1); });
+            }catch(e){}
+        }
+
+        document.addEventListener('visibilitychange', ()=>{
+            if(document.visibilityState==='visible' && !isPaused && persistentAudio.src && persistentAudio.paused && currentTextArray.length>0){
+                persistentAudio.play().catch(()=>{});
+            }
+        });
+
+        ttsPlay.addEventListener('click', ()=>{
+            if(isDownloading) return;
+            // ดึงข้อความจากช่องผลลัพธ์เป็นหลัก ถ้าไม่มีให้เอาจากช่องข้อมูล
+            const rawText = outputArea.value.trim() || inputArea.value.trim();
+            const fil = filterTextToSpeak(rawText);
+            if(!fil){ setStatus('กรุณาเตรียมข้อความในช่องก่อนนะคะ!'); return; }
+            currentTextArray = chunkText(fil, 120);
+            if(currentTextArray.length===0) currentTextArray=[fil];
+            stopSpeaking();
+            playFromIndex(0);
+        });
+
+        ttsPause.addEventListener('click', ()=>{
+            if(isDownloading || currentTextArray.length===0) return;
+            if(!persistentAudio.paused && persistentAudio.src){
+                persistentAudio.pause(); isPaused=true; setStatus('หยุดพักแล้วค่ะ');
+                if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='paused';}catch(e){}}
+            } else if(isPaused){
+                isPaused=false; setStatus('กำลังอ่านต่อค่ะ...', true);
+                if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='playing';}catch(e){}}
+                persistentAudio.play().catch(()=>{ playFromIndex(currentIndex); });
+            }
+        });
+
+        ttsDownload.addEventListener('click', async ()=>{
+            if(isDownloading) return;
+            const rawText = outputArea.value.trim() || inputArea.value.trim();
+            const fil = filterTextToSpeak(rawText);
+            if(!fil){ setStatus('ไม่มีข้อความให้บันทึกค่ะ!'); return; }
+            
+            stopSpeaking();
+            isDownloading = true;
+            ttsDownload.classList.add('opacity-60');
+            ttsDownload.style.pointerEvents = 'none';
+            setStatus('เตรียมไฟล์เสียง...', true);
+            downloadProgress.style.width = '0%';
+            downloadText.textContent = 'กำลังเตรียม...';
+            
+            const chunks = chunkText(fil, 120);
+            const total = chunks.length;
+            let blobs = [];
+
+            try {
+                for(let i=0; i<total; i++) {
+                    setStatus(`กำลังโหลดส่วนที่ ${i+1}/${total}...`, true);
+                    downloadProgress.style.width = `${((i+1)/total)*100}%`;
+                    downloadText.textContent = `${Math.round(((i+1)/total)*100)}% • ${i+1}/${total}`;
+                    const clean = chunks[i].replace(/\s+/g,' ').trim();
+                    if(!clean) continue;
+                    
+                    const url = buildTTSUrl(clean);
+                    let retries = 0, blob = null;
+                    while(retries < 3){
+                        try {
+                            const r = await fetch(url, {mode:'cors', cache:'no-cache'});
+                            if(!r.ok) throw new Error(`HTTP ${r.status}`);
+                            const b = await r.blob();
+                            if(b.size < 500) throw new Error('ไฟล์เล็กผิดปกติ');
+                            blob = b; break;
+                        }catch(e){
+                            retries++;
+                            if(retries>=3) throw e;
+                            await new Promise(r=>setTimeout(r, 800*retries));
+                        }
+                    }
+                    if(blob) blobs.push(blob);
+                    await new Promise(r=>setTimeout(r, 600));
+                }
+                
+                if(blobs.length===0) throw new Error('ไม่ได้ไฟล์เสียงเลย');
+                setStatus('กำลังรวมไฟล์...', true);
+                downloadText.textContent = 'กำลังรวมไฟล์...';
+                
+                const finalBlob = new Blob(blobs, {type:'audio/mpeg'});
+                const blobUrl = URL.createObjectURL(finalBlob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = `TheMuiz_Female_${new Date().toISOString().slice(0,10)}.mp3`;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(blobUrl); }, 1000);
+                
+                setStatus(`บันทึกสำเร็จ! ${total} ส่วน • ${Math.round(finalBlob.size/1024)} KB 🎉`);
+                downloadText.textContent = 'บันทึกสำเร็จ!';
+            }catch(err){
+                console.error(err);
+                setStatus(`ผิดพลาด: ${err.message}`);
+                downloadText.textContent = 'ลองใหม่';
+            }finally{
+                isDownloading = false;
+                ttsDownload.classList.remove('opacity-60');
+                ttsDownload.style.pointerEvents = 'auto';
+                setTimeout(()=>{
+                    downloadProgress.style.width = '0%';
+                    downloadText.textContent = '💾 บันทึกไฟล์เสียง MP3';
+                    ttsLoader.style.display = 'none';
+                }, 2500);
+            }
+        });
+
+
+        // =========================================================
+        // ฟังก์ชันจัดการข้อความ (ส่วนที่นำมาจากโค้ดเก่า)
         // =========================================================
 
         function arabicToThaiText(numberStr) {
             let cleanNum = numberStr.replace(/,/g, '');
-            
             if (cleanNum.includes('.')) {
                 let parts = cleanNum.split('.');
                 let intPart = parts[0];
                 let decPart = parts.slice(1).join('');
-                
                 let intText = intPart ? arabicToThaiText(intPart) : "";
                 let decText = "";
                 if (decPart) {
                     const digits = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
                     decText = "จุด" + Array.from(decPart).map(d => digits[parseInt(d)] || d).join('');
                 }
-                if (!intPart) {
-                    return "จุด" + Array.from(decPart).map(d => digits[parseInt(d)] || d).join('');
-                }
+                if (!intPart) return "จุด" + Array.from(decPart).map(d => digits[parseInt(d)] || d).join('');
                 return intText + decText;
             }
-
             let num = parseInt(cleanNum, 10);
             if (isNaN(num)) return numberStr;
             if (num === 0) return "ศูนย์";
-
             const digits = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
             const positions = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
-
             function convertChunk(str) {
-                let res = "";
-                let len = str.length;
+                let res = ""; let len = str.length;
                 for (let i = 0; i < len; i++) {
-                    let d = parseInt(str[i]);
-                    let pos = len - 1 - i;
+                    let d = parseInt(str[i]); let pos = len - 1 - i;
                     if (d !== 0) {
-                        if (pos === 1 && d === 1) {
-                            res += "สิบ";
-                        } else if (pos === 1 && d === 2) {
-                            res += "ยี่สิบ";
-                        } else if (pos === 0 && d === 1 && len > 1 && str[len-2] !== '0') {
-                            res += "เอ็ด";
-                        } else if (pos === 0 && d === 1 && len > 1 && str[len-2] === '0') {
-                            res += "หนึ่ง";
-                        } else {
-                            res += digits[d] + positions[pos];
-                        }
+                        if (pos === 1 && d === 1) res += "สิบ";
+                        else if (pos === 1 && d === 2) res += "ยี่สิบ";
+                        else if (pos === 0 && d === 1 && len > 1 && str[len-2] !== '0') res += "เอ็ด";
+                        else if (pos === 0 && d === 1 && len > 1 && str[len-2] === '0') res += "หนึ่ง";
+                        else res += digits[d] + positions[pos];
                     }
                 }
                 return res;
             }
-
             let s = num.toString();
             if (s.length > 7) {
                 let parts = [];
@@ -722,9 +745,7 @@
                 let result = "";
                 for (let i = 0; i < parts.length; i++) {
                     let chunkResult = convertChunk(parts[i]);
-                    if (chunkResult !== "") {
-                        result += chunkResult + (i < parts.length - 1 ? "ล้าน" : "");
-                    }
+                    if (chunkResult !== "") result += chunkResult + (i < parts.length - 1 ? "ล้าน" : "");
                 }
                 return result;
             } else {
@@ -743,7 +764,6 @@
 
         function convertNumberToTextEngine(text) {
             const regex = /\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?|\+|\%|=|(?<=\d)\.(?=\d)/g;
-            
             return text.replace(regex, (match, offset, string) => {
                 if (match === '+') return 'บวก';
                 if (match === '=') return 'เท่ากับ';
@@ -754,638 +774,92 @@
                 let cleanNum = match.replace(/,/g, '');
                 let intPart = cleanNum.includes('.') ? cleanNum.split('.')[0] : cleanNum;
 
-                // กฎพิเศษ 1: ถ้าเป็นตัวเลขที่มี 0 นำหน้า และยาวตั้งแต่ 2 หลักขึ้นไป ให้อ่านเรียงตัวทีละตัวเสมอ
-                if (intPart.length > 1 && intPart.startsWith('0')) {
-                    return readDigitByDigit(cleanNum);
-                }
+                if (intPart.length > 1 && intPart.startsWith('0')) return readDigitByDigit(cleanNum);
+                if (hasComma) return arabicToThaiText(match);
 
-                // กฎ 1: ถ้าตัวเลขมีลูกน้ำ (,) ให้อ่านตามหลักปกติ (พัน, หมื่น, แสน) เสมอ
-                if (hasComma) {
-                    return arabicToThaiText(match);
-                }
-
-                // กฎ 2: ถ้าไม่มีลูกน้ำ และตัวเลขมี 4 หลักขึ้นไป (เฉพาะเลขจำนวนเต็ม ไม่นับทศนิยม)
                 if (intPart.length >= 4) {
                     let beforeText = string.substring(0, offset).trimEnd();
                     let afterText = string.substring(offset + match.length).trimStart();
-
                     const prefixRegex = /(ปี|ค\.ศ\.|พ\.ศ\.|ค\.ศ|พ\.ศ|คริสตศักราช|พุทธศักราช|ราคา|จำนวน|เงิน|รวม|ที่)$/;
                     const suffixRegex = /^(บาท|ดอลลาร์|เยน|ยูโร|คน|ชิ้น|อัน|ตัว|เครื่อง|รายการ|เปอร์เซ็นต์|%|บาทถ้วน)/;
-
                     if (prefixRegex.test(beforeText) || suffixRegex.test(afterText)) {
                         return arabicToThaiText(match);
                     } else {
                         return readDigitByDigit(cleanNum);
                     }
                 }
-
-                // กฎ 3: ถ้าตัวเลขน้อยกว่า 4 หลัก และไม่ขึ้นต้นด้วย 0 ให้อ่านตามหลักปกติ
                 return arabicToThaiText(match);
             });
         }
-        // =========================================================
-
 
         function processOutput() {
-
             let text = inputArea.value;
-
-            const removeStr =
-                customRemoveInput.value;
-
+            const removeStr = customRemoveInput.value;
             if (removeStr) {
-
-                const chars =
-                    removeStr
-                        .split(',')
-                        .map(c =>
-                            c.replace(
-                                /[.*+?^${}()|[\]\\]/g,
-                                '\\$&'
-                            )
-                        );
-
-                text =
-                    text.replace(
-                        new RegExp(
-                            `(${chars.join('|')})`,
-                            'g'
-                        ),
-                        ''
-                    );
+                const chars = removeStr.split(',').map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+                text = text.replace(new RegExp(`(${chars.join('|')})`, 'g'), '');
             }
-
             outputArea.value = text;
-
-            inputCount.innerText =
-                `${inputArea.value.length} อักษร`;
-
-            outputCount.innerText =
-                `${outputArea.value.length} อักษร`;
-
+            inputCount.innerText = `${inputArea.value.length} อักษร`;
+            outputCount.innerText = `${outputArea.value.length} อักษร`;
             saveState(text);
         }
 
-
-        inputArea.addEventListener(
-            'input',
-            () => {
-                processOutput();
-            }
-        );
-
-
-        customRemoveInput.addEventListener(
-            'input',
-            processOutput
-        );
-
+        inputArea.addEventListener('input', () => { processOutput(); });
+        customRemoveInput.addEventListener('input', processOutput);
 
         function applyTool(action) {
-
             let text = inputArea.value;
-
-            const removeStr =
-                customRemoveInput.value;
-
+            const removeStr = customRemoveInput.value;
+            
             if (removeStr) {
-
-                const chars =
-                    removeStr
-                        .split(',')
-                        .map(c =>
-                            c.replace(
-                                /[.*+?^${}()|[\]\\]/g,
-                                '\\$&'
-                            )
-                        );
-
-                text =
-                    text.replace(
-                        new RegExp(
-                            `(${chars.join('|')})`,
-                            'g'
-                        ),
-                        ''
-                    );
+                const chars = removeStr.split(',').map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+                text = text.replace(new RegExp(`(${chars.join('|')})`, 'g'), '');
             }
-
 
             switch(action) {
-
-                case 'removeAllSymbols':
-                    text =
-                        text.replace(
-                            /[^\p{L}\p{M}\p{N}\s]/gu,
-                            ''
-                        );
-                    break;
-
-
-                case 'removeSymbolsKeepBasic':
-                    text =
-                        text.replace(
-                            /[^\p{L}\p{M}\p{N}\s.,!?"'\-()]/gu,
-                            ''
-                        );
-                    break;
-
-
-                case 'removeNumbers':
-                    text =
-                        text.replace(
-                            /[0-9๐-๙]/g,
-                            ''
-                        );
-                    break;
-
-
-                case 'removeEnglish':
-                    text =
-                        text.replace(
-                            /[a-zA-Z]/g,
-                            ''
-                        );
-                    break;
-
-
+                case 'removeAllSymbols': text = text.replace(/[^\p{L}\p{M}\p{N}\s]/gu, ''); break;
+                case 'removeSymbolsKeepBasic': text = text.replace(/[^\p{L}\p{M}\p{N}\s.,!?"'\-()]/gu, ''); break;
+                case 'removeNumbers': text = text.replace(/[0-9๐-๙]/g, ''); break;
+                case 'removeEnglish': text = text.replace(/[a-zA-Z]/g, ''); break;
+                
+                // ซ่อมโค้ดแปลงตัวเลขที่ถูกตัดขาดไปให้สมบูรณ์
                 case 'toThaiNumbers':
-                    text =
-                        text.replace(
-                            /[0-9]/g,
-                            m =>
-                                ({
-                                    '0':'๐',
-                                    '1':'๑',
-                                    '2':'๒',
-                                    '3':'๓',
-                                    '4':'๔',
-                                    '5':'๕',
-                                    '6':'๖',
-                                    '7':'๗',
-                                    '8':'๘',
-                                    '9':'๙'
-                                })[m]
-                        );
+                    text = text.replace(/[0-9]/g, m => ({
+                        '0':'๐', '1':'๑', '2':'๒', '3':'๓', '4':'๔',
+                        '5':'๕', '6':'๖', '7':'๗', '8':'๘', '9':'๙'
+                    })[m]);
                     break;
-
-
                 case 'toArabicNumbers':
-                    text =
-                        text.replace(
-                            /[๐-๙]/g,
-                            m =>
-                                ({
-                                    '๐':'0',
-                                    '๑':'1',
-                                    '๒':'2',
-                                    '๓':'3',
-                                    '๔':'4',
-                                    '๕':'5',
-                                    '๖':'6',
-                                    '๗':'7',
-                                    '๘':'8',
-                                    '๙':'9'
-                                })[m]
-                        );
+                    text = text.replace(/[๐-๙]/g, m => ({
+                        '๐':'0', '๑':'1', '๒':'2', '๓':'3', '๔':'4',
+                        '๕':'5', '๖':'6', '๗':'7', '๘':'8', '๙':'9'
+                    })[m]);
                     break;
 
-
-                case 'upperCaseEng':
-                    text =
-                        text.replace(
-                            /[a-z]/g,
-                            m => m.toUpperCase()
-                        );
+                case 'upperCaseEng': text = text.toUpperCase(); break;
+                case 'lowerCaseEng': text = text.toLowerCase(); break;
+                case 'capitalizeEng': text = text.replace(/\b\w/g, c => c.toUpperCase()); break;
+                case 'removeSpaces': text = text.replace(/\s+/g, ''); break;
+                case 'removeNewlines': text = text.replace(/\n/g, ''); break;
+                case 'removeDuplicateSpaces': text = text.replace(/ {2,}/g, ' '); break;
+                case 'removeDuplicateLines': 
+                    text = text.split('\n').filter((item, i, allItems) => i === allItems.indexOf(item)).join('\n'); 
                     break;
-
-
-                case 'lowerCaseEng':
-                    text =
-                        text.replace(
-                            /[A-Z]/g,
-                            m => m.toLowerCase()
-                        );
-                    break;
-
-
-                case 'capitalizeEng':
-                    text =
-                        text.replace(
-                            /\b[a-zA-Z]/g,
-                            m => m.toUpperCase()
-                        );
-                    break;
-
-
-                case 'removeSpaces':
-                    text =
-                        text.replace(
-                            /[ \t]+/g,
-                            ''
-                        );
-                    break;
-
-
-                case 'removeNewlines':
-                    text =
-                        text.replace(
-                            /[\r\n]+/g,
-                            ''
-                        );
-                    break;
-
-
-                case 'removeDuplicateSpaces':
-                    text =
-                        text.replace(
-                            /[ \t]{2,}/g,
-                            ' '
-                        );
-                    break;
-
-
-                case 'removeDuplicateLines':
-                    text =
-                        text.replace(
-                            /(\r?\n){2,}/g,
-                            '\n'
-                        );
-                    break;
-
-
-                case 'extractNumbers':
-
-                    const n =
-                        text.match(
-                            /[0-9๐-๙]+/g
-                        );
-
-                    text =
-                        n ? n.join('\n') : '';
-
-                    break;
-
-
-                case 'extractThai':
-
-                    const t =
-                        text.match(
-                            /[ก-๙]+/g
-                        );
-
-                    text =
-                        t ? t.join('\n') : '';
-
-                    break;
-
-
-                case 'extractEnglish':
-
-                    const e =
-                        text.match(
-                            /[a-zA-Z]+/g
-                        );
-
-                    text =
-                        e ? e.join('\n') : '';
-
-                    break;
-
-
-                case 'reverseText':
-
-                    text =
-                        text
-                            .split('')
-                            .reverse()
-                            .join('');
-
-                    break;
-
-
-                case 'removeLinks':
-
-                    text =
-                        text.replace(
-                            /(?:https?:\/\/|www\.)[^\s]+/gi,
-                            ''
-                        );
-
-                    break;
-
-
-                case 'removeAIReferences':
-
-                    text =
-                        text.replace(
-                            /\[\[[\s\S]*?\]\]/g,
-                            ''
-                        );
-
-                    break;
-
-
-                case 'convertNumbersToThaiText': // ปุ่มใหม่
-                    text = convertNumberToTextEngine(text);
-                    break;
+                case 'extractNumbers': text = text.replace(/[^0-9๐-๙\n\s]/g, ''); break;
+                case 'extractThai': text = text.replace(/[^ก-๙\n\s]/g, ''); break;
+                case 'extractEnglish': text = text.replace(/[^a-zA-Z\n\s]/g, ''); break;
+                case 'reverseText': text = text.split('').reverse().join(''); break;
+                case 'removeLinks': text = text.replace(/https?:\/\/[^\s]+/g, ''); break;
+                case 'removeAIReferences': text = text.replace(/\]+\]/g, '').replace(/\[\d+\]/g, ''); break;
+                case 'convertNumbersToThaiText': text = convertNumberToTextEngine(text); break;
             }
-
 
             outputArea.value = text;
-
-            outputCount.innerText =
-                `${text.length} อักษร`;
-
+            inputCount.innerText = `${inputArea.value.length} อักษร`;
+            outputCount.innerText = `${outputArea.value.length} อักษร`;
             saveState(text);
         }
-
-
-        /* ====================================================== */
-        /* ระบบบันทึกไฟล์ (เอาหน้าต่าง Prompt ออก เซฟอัตโนมัติทันที) */
-        /* ====================================================== */
-
-        function saveDocument() {
-
-            const text =
-                outputArea.value;
-
-            const format =
-                document.getElementById(
-                    'document-format'
-                ).value;
-
-            if (!text.trim()) {
-
-                alert(
-                    'ไม่มีข้อความในช่องแสดงผลลัพธ์สำหรับบันทึก'
-                );
-
-                return;
-            }
-
-            const defaultName = "TheMuiZ_Document";
-            const fileName = `${defaultName}.${format}`;
-
-
-            if (format === 'txt') {
-
-                downloadBlob(
-                    text,
-                    'text/plain;charset=utf-8',
-                    fileName
-                );
-
-            }
-
-
-            else if (format === 'md') {
-
-                downloadBlob(
-                    text,
-                    'text/markdown;charset=utf-8',
-                    fileName
-                );
-
-            }
-
-
-            else if (format === 'csv') {
-
-                downloadBlob(
-                    '\uFEFF' + text,
-                    'text/csv;charset=utf-8',
-                    fileName
-                );
-
-            }
-
-
-            else if (format === 'html') {
-
-                const htmlContent =
-`<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<title>${defaultName}</title>
-</head>
-<body>
-<pre>${escapeHtml(text)}</pre>
-</body>
-</html>`;
-
-                downloadBlob(
-                    htmlContent,
-                    'text/html;charset=utf-8',
-                    fileName
-                );
-            }
-
-
-            else if (format === 'json') {
-
-                const jsonContent =
-                    JSON.stringify(
-                        {
-                            source: 'TheMuiZ',
-                            title: defaultName,
-                            content: text
-                        },
-                        null,
-                        2
-                    );
-
-                downloadBlob(
-                    jsonContent,
-                    'application/json;charset=utf-8',
-                    fileName
-                );
-            }
-
-
-            else if (format === 'xml') {
-
-                const xmlContent =
-`<?xml version="1.0" encoding="UTF-8"?>
-<document>
-    <source>TheMuiZ</source>
-    <title>${defaultName}</title>
-    <content><![CDATA[
-${text}
-    ]]></content>
-</document>`;
-
-                downloadBlob(
-                    xmlContent,
-                    'application/xml;charset=utf-8',
-                    fileName
-                );
-            }
-
-
-            else if (format === 'pdf') {
-
-                saveAsPDF(text, fileName);
-            }
-        }
-
-
-        function downloadBlob(
-            content,
-            type,
-            fileName
-        ) {
-            
-            const blob =
-                new Blob(
-                    [content],
-                    { type: type }
-                );
-
-            const url =
-                URL.createObjectURL(blob);
-
-
-            const link =
-                document.createElement('a');
-
-            link.href = url;
-
-            link.download =
-                fileName;
-
-            document.body.appendChild(link);
-
-            link.click();
-
-            document.body.removeChild(link);
-
-            setTimeout(() => {
-                URL.revokeObjectURL(url);
-            }, 100);
-
-            showSaveToast();
-        }
-
-
-        function saveAsPDF(text, fileName) {
-
-            const {
-                jsPDF
-            } = window.jspdf;
-
-            const doc =
-                new jsPDF();
-
-
-            const pageWidth =
-                doc.internal.pageSize.getWidth();
-
-            const margin = 15;
-
-            const maxWidth =
-                pageWidth -
-                (margin * 2);
-
-
-            doc.setFont(
-                'helvetica',
-                'normal'
-            );
-
-            doc.setFontSize(12);
-
-
-            const lines =
-                doc.splitTextToSize(
-                    text,
-                    maxWidth
-                );
-
-
-            let y = 20;
-
-            const lineHeight = 7;
-
-
-            lines.forEach(
-                line => {
-
-                    if (y > 280) {
-
-                        doc.addPage();
-
-                        y = 20;
-                    }
-
-                    doc.text(
-                        line,
-                        margin,
-                        y
-                    );
-
-                    y += lineHeight;
-                }
-            );
-
-            
-            doc.save(
-                fileName
-            );
-
-            showSaveToast();
-        }
-
-
-        function escapeHtml(text) {
-
-            return text
-                .replace(
-                    /&/g,
-                    '&amp;'
-                )
-                .replace(
-                    /</g,
-                    '&lt;'
-                )
-                .replace(
-                    />/g,
-                    '&gt;'
-                )
-                .replace(
-                    /"/g,
-                    '&quot;'
-                )
-                .replace(
-                    /'/g,
-                    '&#039;'
-                );
-        }
-
-
-        function showSaveToast() {
-
-            toast.innerText =
-                'บันทึกไฟล์สำเร็จ!';
-
-            toast.className =
-                "show";
-
-
-            setTimeout(
-                () => {
-
-                    toast.className = "";
-
-                    toast.innerText =
-                        "คัดลอกข้อความสำเร็จ!";
-
-                },
-                2000
-            );
-        }
-
     </script>
 </body>
 </html>
