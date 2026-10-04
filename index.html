@@ -248,6 +248,7 @@
         .btn-c17 { background: #bf360c; }
         .btn-c18 { background: #7b1fa2; }
         .btn-c19 { background: #004d40; }
+        .btn-c20 { background: #01579b; }
 
         .footer {
             text-align: center;
@@ -546,6 +547,14 @@
                     ลบแหล่งอ้างอิง AI
                 </button>
 
+                <button
+                    class="tool-btn btn-c20"
+                    onclick="applyTool('convertNumbersToThaiText')"
+                    style="grid-column: span 2;"
+                >
+                    แปลงเป็นตัวอักษรทั้งหมด
+                </button>
+
             </div>
         </div>
     </div>
@@ -648,6 +657,133 @@
                 2000
             );
         }
+
+        // =========================================================
+        // ฟังก์ชันสำหรับแปลงตัวเลขเป็นคำอ่านภาษาไทย (นำมาจากโค้ดต้นฉบับที่ให้มา)
+        // =========================================================
+
+        function arabicToThaiText(numberStr) {
+            let cleanNum = numberStr.replace(/,/g, '');
+            
+            if (cleanNum.includes('.')) {
+                let parts = cleanNum.split('.');
+                let intPart = parts[0];
+                let decPart = parts.slice(1).join('');
+                
+                let intText = intPart ? arabicToThaiText(intPart) : "";
+                let decText = "";
+                if (decPart) {
+                    const digits = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
+                    decText = "จุด" + Array.from(decPart).map(d => digits[parseInt(d)] || d).join('');
+                }
+                if (!intPart) {
+                    return "จุด" + Array.from(decPart).map(d => digits[parseInt(d)] || d).join('');
+                }
+                return intText + decText;
+            }
+
+            let num = parseInt(cleanNum, 10);
+            if (isNaN(num)) return numberStr;
+            if (num === 0) return "ศูนย์";
+
+            const digits = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
+            const positions = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
+
+            function convertChunk(str) {
+                let res = "";
+                let len = str.length;
+                for (let i = 0; i < len; i++) {
+                    let d = parseInt(str[i]);
+                    let pos = len - 1 - i;
+                    if (d !== 0) {
+                        if (pos === 1 && d === 1) {
+                            res += "สิบ";
+                        } else if (pos === 1 && d === 2) {
+                            res += "ยี่สิบ";
+                        } else if (pos === 0 && d === 1 && len > 1 && str[len-2] !== '0') {
+                            res += "เอ็ด";
+                        } else if (pos === 0 && d === 1 && len > 1 && str[len-2] === '0') {
+                            res += "หนึ่ง";
+                        } else {
+                            res += digits[d] + positions[pos];
+                        }
+                    }
+                }
+                return res;
+            }
+
+            let s = num.toString();
+            if (s.length > 7) {
+                let parts = [];
+                while (s.length > 0) {
+                    parts.unshift(s.slice(Math.max(0, s.length - 6), s.length));
+                    s = s.slice(0, Math.max(0, s.length - 6));
+                }
+                let result = "";
+                for (let i = 0; i < parts.length; i++) {
+                    let chunkResult = convertChunk(parts[i]);
+                    if (chunkResult !== "") {
+                        result += chunkResult + (i < parts.length - 1 ? "ล้าน" : "");
+                    }
+                }
+                return result;
+            } else {
+                return convertChunk(s);
+            }
+        }
+
+        function readDigitByDigit(numStr) {
+            const digits = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
+            return Array.from(numStr).map(char => {
+                if (char >= '0' && char <= '9') return digits[parseInt(char)];
+                if (char === '.') return 'จุด';
+                return char;
+            }).join('');
+        }
+
+        function convertNumberToTextEngine(text) {
+            const regex = /\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?|\+|\%|=|(?<=\d)\.(?=\d)/g;
+            
+            return text.replace(regex, (match, offset, string) => {
+                if (match === '+') return 'บวก';
+                if (match === '=') return 'เท่ากับ';
+                if (match === '%') return 'เปอร์เซ็นต์';
+                if (match === '.') return 'จุด';
+
+                let hasComma = match.includes(',');
+                let cleanNum = match.replace(/,/g, '');
+                let intPart = cleanNum.includes('.') ? cleanNum.split('.')[0] : cleanNum;
+
+                // กฎพิเศษ 1: ถ้าเป็นตัวเลขที่มี 0 นำหน้า และยาวตั้งแต่ 2 หลักขึ้นไป ให้อ่านเรียงตัวทีละตัวเสมอ
+                if (intPart.length > 1 && intPart.startsWith('0')) {
+                    return readDigitByDigit(cleanNum);
+                }
+
+                // กฎ 1: ถ้าตัวเลขมีลูกน้ำ (,) ให้อ่านตามหลักปกติ (พัน, หมื่น, แสน) เสมอ
+                if (hasComma) {
+                    return arabicToThaiText(match);
+                }
+
+                // กฎ 2: ถ้าไม่มีลูกน้ำ และตัวเลขมี 4 หลักขึ้นไป (เฉพาะเลขจำนวนเต็ม ไม่นับทศนิยม)
+                if (intPart.length >= 4) {
+                    let beforeText = string.substring(0, offset).trimEnd();
+                    let afterText = string.substring(offset + match.length).trimStart();
+
+                    const prefixRegex = /(ปี|ค\.ศ\.|พ\.ศ\.|ค\.ศ|พ\.ศ|คริสตศักราช|พุทธศักราช|ราคา|จำนวน|เงิน|รวม|ที่)$/;
+                    const suffixRegex = /^(บาท|ดอลลาร์|เยน|ยูโร|คน|ชิ้น|อัน|ตัว|เครื่อง|รายการ|เปอร์เซ็นต์|%|บาทถ้วน)/;
+
+                    if (prefixRegex.test(beforeText) || suffixRegex.test(afterText)) {
+                        return arabicToThaiText(match);
+                    } else {
+                        return readDigitByDigit(cleanNum);
+                    }
+                }
+
+                // กฎ 3: ถ้าตัวเลขน้อยกว่า 4 หลัก และไม่ขึ้นต้นด้วย 0 ให้อ่านตามหลักปกติ
+                return arabicToThaiText(match);
+            });
+        }
+        // =========================================================
 
 
         function processOutput() {
@@ -947,6 +1083,11 @@
                             ''
                         );
 
+                    break;
+
+
+                case 'convertNumbersToThaiText': // ปุ่มใหม่
+                    text = convertNumberToTextEngine(text);
                     break;
             }
 
@@ -1248,4 +1389,3 @@ ${text}
     </script>
 </body>
 </html>
-
