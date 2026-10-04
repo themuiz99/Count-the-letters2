@@ -6,7 +6,6 @@
     <title>TheMuiZ เครื่องมือจัดการตัวอักษร & อ่านออกเสียง</title>
     <link href="https://fonts.googleapis.com/css2?family=Pattaya&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
     
-    <!-- Script สำหรับ PDF และเสียงพากย์ผู้หญิง -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script id="voice-female" src="https://code.responsivevoice.org/responsivevoice.js?key=Negu9VLC"></script>
 
@@ -24,315 +23,51 @@
             --border: #333333;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Sarabun', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            padding: 8px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 5px;
-            flex-shrink: 0;
-        }
-
-        .site-title {
-            font-family: 'Pattaya', sans-serif;
-            font-size: 24px;
-            background: linear-gradient(45deg, var(--accent), #ff79c6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin: 0;
-            line-height: 1.1;
-        }
-
-        .site-subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .workspace {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-            gap: 8px;
-        }
-
-        @media (min-width: 768px) {
-            .workspace {
-                flex-direction: row;
-            }
-        }
-
-        .text-section {
-            display: flex;
-            flex-direction: column;
-            flex: 2;
-            gap: 8px;
-            min-height: 0;
-        }
-
-        .box-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            background: var(--bg-card);
-            border-radius: 8px;
-            padding: 8px;
-            border: 1px solid var(--border);
-            position: relative;
-            min-height: 0;
-        }
-
-        .box-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .btn-group-small button {
-            background: var(--btn-bg);
-            color: var(--text-main);
-            border: none;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-undo {
-            background: #f57c00 !important;
-            color: #fff !important;
-            border: 1px solid #e65100 !important;
-        }
-
-        .btn-danger {
-            background: #d32f2f !important;
-            color: #fff !important;
-            border: 1px solid #b71c1c !important;
-        }
-
-        .btn-success {
-            background: #2e7d32 !important;
-            color: #fff !important;
-            border: 1px solid #1b5e20 !important;
-        }
-
-        .textarea-wrapper {
-            position: relative;
-            flex: 1;
-            display: flex;
-            min-height: 0;
-        }
-
-        textarea {
-            width: 100%;
-            height: 100%;
-            background: var(--bg-input);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 8px;
-            font-size: 14px;
-            resize: none;
-            outline: none;
-            overflow-y: auto;
-        }
-
-        .char-count {
-            position: absolute;
-            bottom: 4px;
-            right: 8px;
-            font-size: 10px;
-            color: var(--text-muted);
-            background: rgba(42, 42, 42, 0.8);
-            padding: 1px 4px;
-            border-radius: 4px;
-        }
-
-        .custom-remove-sec {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-card);
-            padding: 5px 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            flex-shrink: 0;
-            font-size: 13px;
-        }
-
-        .custom-remove-sec input {
-            flex: 1;
-            background: var(--bg-input);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 4px 8px;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        .tools-section {
-            background: var(--bg-card);
-            border-radius: 8px;
-            padding: 6px;
-            border: 1px solid var(--border);
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-        }
-
-        .tools-title {
-            font-size: 12px;
-            color: var(--accent);
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 2px;
-            margin-top: 4px;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-        }
-
-        .tool-btn {
-            color: #fff;
-            border: 1px solid transparent;
-            padding: 5px 2px;
-            border-radius: 4px;
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
-        .tool-btn:hover {
-            filter: brightness(1.1);
-        }
-
-        .btn-c1 { background: #b71c1c; }
-        .btn-c2 { background: #c62828; }
-        .btn-c3 { background: #d84315; }
-        .btn-c4 { background: #ef6c00; }
-        .btn-c5 { background: #f9a825; }
-        .btn-c6 { background: #9e9d24; }
-        .btn-c7 { background: #558b2f; }
-        .btn-c8 { background: #00695c; }
-        .btn-c9 { background: #00838f; }
-        .btn-c10 { background: #0277bd; }
-        .btn-c11 { background: #1565c0; }
-        .btn-c12 { background: #283593; }
-        .btn-c13 { background: #4527a0; }
-        .btn-c14 { background: #6a1b9a; }
-        .btn-c15 { background: #ad1457; }
-        .btn-c16 { background: #4e342e; }
-        .btn-c17 { background: #bf360c; }
-        .btn-c18 { background: #7b1fa2; }
-        .btn-c19 { background: #004d40; }
-        .btn-c20 { background: #01579b; }
-
-        /* สีพิเศษสำหรับปุ่มดาวน์โหลดและเล่นเสียง */
-        .btn-play { background: #7c3aed; }
-        .btn-pause { background: #4b5563; }
-        .btn-download-mp3 { background: #10b981; position: relative; overflow: hidden; }
-
-        .footer {
-            text-align: center;
-            margin-top: 2px;
-            font-size: 9px;
-            color: var(--text-muted);
-        }
-
-        #toast {
-            visibility: hidden;
-            min-width: 150px;
-            background-color: #4caf50;
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 8px;
-            position: fixed;
-            left: 50%;
-            bottom: 20px;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-            z-index: 999;
-        }
-
-        #toast.show {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .save-document-section {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .save-document-section select {
-            background: var(--btn-bg);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 3px 5px;
-            font-size: 11px;
-            cursor: pointer;
-            outline: none;
-        }
-
-        .btn-save-document {
-            background: #1565c0 !important;
-            color: #fff !important;
-            border: 1px solid #0d47a1 !important;
-            padding: 3px 7px !important;
-            border-radius: 4px !important;
-            font-size: 11px !important;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-save-document:hover {
-            background: #1976d2 !important;
-        }
-
-        .loader { 
-            width: 12px; height: 12px; 
-            border: 2px solid rgba(255,255,255,0.2); 
-            border-top-color: #bb86fc; 
-            border-radius: 50%; 
-            animation: spin 0.8s linear infinite; 
-            display: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding: 8px; }
+        .header { text-align: center; margin-bottom: 5px; flex-shrink: 0; }
+        .site-title { font-family: 'Pattaya', sans-serif; font-size: 24px; background: linear-gradient(45deg, var(--accent), #ff79c6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin: 0; line-height: 1.1; }
+        .site-subtitle { font-size: 12px; color: var(--text-muted); }
+        .workspace { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 8px; }
+        @media (min-width: 768px) { .workspace { flex-direction: row; } }
+        .text-section { display: flex; flex-direction: column; flex: 2; gap: 8px; min-height: 0; }
+        .box-container { display: flex; flex-direction: column; flex: 1; background: var(--bg-card); border-radius: 8px; padding: 8px; border: 1px solid var(--border); position: relative; min-height: 0; }
+        .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 13px; flex-shrink: 0; }
+        .btn-group-small button { background: var(--btn-bg); color: var(--text-main); border: none; padding: 2px 6px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: 0.2s; }
+        .btn-undo { background: #f57c00 !important; color: #fff !important; border: 1px solid #e65100 !important; }
+        .btn-danger { background: #d32f2f !important; color: #fff !important; border: 1px solid #b71c1c !important; }
+        .btn-success { background: #2e7d32 !important; color: #fff !important; border: 1px solid #1b5e20 !important; }
+        .textarea-wrapper { position: relative; flex: 1; display: flex; min-height: 0; }
+        textarea { width: 100%; height: 100%; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 14px; resize: none; outline: none; overflow-y: auto; }
+        .char-count { position: absolute; bottom: 4px; right: 8px; font-size: 10px; color: var(--text-muted); background: rgba(42, 42, 42, 0.8); padding: 1px 4px; border-radius: 4px; }
+        .custom-remove-sec { display: flex; align-items: center; gap: 8px; background: var(--bg-card); padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; font-size: 13px; }
+        .custom-remove-sec input { flex: 1; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; outline: none; }
+        .tools-section { background: var(--bg-card); border-radius: 8px; padding: 6px; border: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .tools-title { font-size: 12px; color: var(--accent); text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 2px; margin-top: 4px; }
+        .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+        .tool-btn { color: #fff; border: 1px solid transparent; padding: 5px 2px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .tool-btn:hover { filter: brightness(1.1); }
+        .btn-c1 { background: #b71c1c; } .btn-c2 { background: #c62828; } .btn-c3 { background: #d84315; } .btn-c4 { background: #ef6c00; }
+        .btn-c5 { background: #f9a825; } .btn-c6 { background: #9e9d24; } .btn-c7 { background: #558b2f; } .btn-c8 { background: #00695c; }
+        .btn-c9 { background: #00838f; } .btn-c10 { background: #0277bd; } .btn-c11 { background: #1565c0; } .btn-c12 { background: #283593; }
+        .btn-c13 { background: #4527a0; } .btn-c14 { background: #6a1b9a; } .btn-c15 { background: #ad1457; } .btn-c16 { background: #4e342e; }
+        .btn-c17 { background: #bf360c; } .btn-c18 { background: #7b1fa2; } .btn-c19 { background: #004d40; } .btn-c20 { background: #01579b; }
+        .btn-play { background: #7c3aed; } .btn-pause { background: #4b5563; } .btn-download-mp3 { background: #10b981; position: relative; overflow: hidden; }
+        .footer { text-align: center; margin-top: 2px; font-size: 9px; color: var(--text-muted); }
+        #toast { visibility: hidden; min-width: 150px; background-color: #4caf50; color: #fff; text-align: center; border-radius: 8px; padding: 8px; position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 12px; z-index: 999; }
+        #toast.show { visibility: visible; opacity: 1; }
+        .save-document-section { display: flex; align-items: center; gap: 5px; }
+        .save-document-section select { background: var(--btn-bg); color: var(--text-main); border: 1px solid var(--border); border-radius: 4px; padding: 3px 5px; font-size: 11px; cursor: pointer; outline: none; }
+        .btn-save-document { background: #1565c0 !important; color: #fff !important; border: 1px solid #0d47a1 !important; padding: 3px 7px !important; border-radius: 4px !important; font-size: 11px !important; cursor: pointer; transition: 0.2s; }
+        .btn-save-document:hover { background: #1976d2 !important; }
+        .loader { width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #bb86fc; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 
 <body>
-    <!-- Audio สำหรับเล่นพื้นหลัง -->
+    <!-- Audio สำหรับเล่นพื้นหลังแบบ Loop สั้นๆ เพื่อหลอกระบบไม่ให้แอปหลับ -->
+    <audio id="keepAliveAudio" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" loop playsinline webkit-playsinline style="display:none;"></audio>
     <audio id="persistentAudio" preload="auto" playsinline webkit-playsinline></audio>
 
     <div class="header">
@@ -386,7 +121,6 @@
         </div>
 
         <div class="tools-section">
-            <!-- หมวดหมู่อ่านออกเสียง (TTS) -->
             <div class="tools-title">เครื่องมืออ่านออกเสียง (MP3)</div>
             <div class="tools-grid" style="margin-bottom: 5px;">
                 <button id="ttsPlay" class="tool-btn btn-play">🔊 อ่านออกเสียง</button>
@@ -401,7 +135,6 @@
                 <span id="ttsStatus">พร้อมใช้งาน (ใช้เสียงผู้หญิงมาตรฐาน)</span>
             </div>
 
-            <!-- หมวดหมู่จัดการข้อความ -->
             <div class="tools-title">เครื่องมือจัดการข้อความ</div>
             <div class="tools-grid">
                 <button class="tool-btn btn-c1" onclick="applyTool('removeAllSymbols')">ลบสัญลักษณ์ทั้งหมด</button>
@@ -477,7 +210,6 @@
         }
 
         function saveDocument() {
-            // ระบบบันทึกไฟล์ (ปรับจากต้นฉบับ)
             const format = document.getElementById('document-format').value;
             const text = outputArea.value;
             if(!text) { alert('ไม่มีข้อความให้บันทึก'); return; }
@@ -487,6 +219,50 @@
             a.download = `TheMuiz_Document_${new Date().getTime()}.${format}`;
             a.click();
         }
+
+        // =========================================================
+        // เทคนิค Web Worker + Keep Alive หลอกระบบแอนดรอยด์ Web-to-App
+        // =========================================================
+        const keepAliveAudio = document.getElementById('keepAliveAudio');
+        let workerBlob = new Blob([`
+            let intervalId = null;
+            self.onmessage = function(e) {
+                if (e.data === 'start') {
+                    if (intervalId) clearInterval(intervalId);
+                    intervalId = setInterval(() => { self.postMessage('tick'); }, 1000);
+                } else if (e.data === 'stop') {
+                    if (intervalId) { clearInterval(intervalId); intervalId = null; }
+                }
+            };
+        `], {type: 'application/javascript'});
+        
+        const backgroundWorker = new Worker(URL.createObjectURL(workerBlob));
+        let isBackgroundActive = false;
+
+        function startBackgroundKeepAlive() {
+            if (!isBackgroundActive) {
+                backgroundWorker.postMessage('start');
+                keepAliveAudio.play().catch(e => console.log('Keep-alive audio block:', e));
+                isBackgroundActive = true;
+            }
+        }
+
+        function stopBackgroundKeepAlive() {
+            if (isBackgroundActive && !isDownloading && !(!isPaused && currentTextArray.length > 0)) {
+                backgroundWorker.postMessage('stop');
+                keepAliveAudio.pause();
+                isBackgroundActive = false;
+            }
+        }
+
+        // Worker ช่วยกระตุ้นระบบไม่ให้หยุดทำงานตอนหน้าจอดับหรือซ่อนแอป
+        backgroundWorker.onmessage = function(e) {
+            if (e.data === 'tick') {
+                if (!isPaused && persistentAudio.paused && persistentAudio.src && currentTextArray.length > 0) {
+                    persistentAudio.play().catch(()=>{});
+                }
+            }
+        };
 
         // =========================================================
         // ฟังก์ชันอ่านออกเสียงและบันทึก MP3
@@ -512,7 +288,6 @@
 
         function buildTTSUrl(t) {
             const clean = t.replace(/\s+/g,' ').trim();
-            // rate=1 เสมอ ตามที่ระบุให้ลบตัวปรับความเร็ว
             return `https://code.responsivevoice.org/getvoice.php?t=${encodeURIComponent(clean)}&tl=th&sv=g2&vn=&pitch=0.5&rate=1&vol=1&key=${apiKey}&cf=mp3`;
         }
 
@@ -545,6 +320,7 @@
             try{ persistentAudio.removeAttribute('src'); persistentAudio.load(); }catch(e){}
             if('mediaSession' in navigator){ try{ navigator.mediaSession.playbackState='none'; }catch(e){} }
             if(reset){ isPaused=false; currentIndex=0; }
+            stopBackgroundKeepAlive();
         }
 
         function playFromIndex(i) {
@@ -552,6 +328,7 @@
                 setStatus('อ่านจบแล้วค่ะ! 🎉');
                 isPaused = false; currentIndex = 0;
                 if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='none';}catch(e){}}
+                stopBackgroundKeepAlive();
                 return;
             }
             currentIndex = i;
@@ -572,6 +349,8 @@
                 }catch(e){}
             }
             setStatus(`กำลังอ่าน... (${currentIndex+1}/${currentTextArray.length})`, true);
+            startBackgroundKeepAlive(); // กระตุ้นแอป
+            
             persistentAudio.play().catch(err=>{
                 setStatus('แตะปุ่มเล่นอีกครั้งเพื่อเล่นต่อค่ะ');
             });
@@ -582,26 +361,39 @@
 
         if('mediaSession' in navigator){
             try{
-                navigator.mediaSession.setActionHandler('play', ()=>{ if(isPaused){ isPaused=false; persistentAudio.play().catch(()=>{}); setStatus(`กำลังอ่านต่อ... (${currentIndex+1}/${currentTextArray.length})`, true); navigator.mediaSession.playbackState='playing'; }});
-                navigator.mediaSession.setActionHandler('pause', ()=>{ if(!persistentAudio.paused){ persistentAudio.pause(); isPaused=true; setStatus('หยุดพักแล้วค่ะ'); navigator.mediaSession.playbackState='paused'; }});
+                navigator.mediaSession.setActionHandler('play', ()=>{ if(isPaused){ isPaused=false; persistentAudio.play().catch(()=>{}); setStatus(`กำลังอ่านต่อ... (${currentIndex+1}/${currentTextArray.length})`, true); navigator.mediaSession.playbackState='playing'; startBackgroundKeepAlive(); }});
+                navigator.mediaSession.setActionHandler('pause', ()=>{ if(!persistentAudio.paused){ persistentAudio.pause(); isPaused=true; setStatus('หยุดพักแล้วค่ะ'); navigator.mediaSession.playbackState='paused'; stopBackgroundKeepAlive(); }});
                 navigator.mediaSession.setActionHandler('stop', ()=>{ stopSpeaking(true); setStatus('หยุดแล้วค่ะ'); });
                 navigator.mediaSession.setActionHandler('nexttrack', ()=>{ if(currentIndex < currentTextArray.length-1) playFromIndex(currentIndex+1); });
                 navigator.mediaSession.setActionHandler('previoustrack', ()=>{ if(currentIndex>0) playFromIndex(currentIndex-1); });
             }catch(e){}
         }
 
+        // ดักจับจังหวะการเปลี่ยนแอปหรือปิดจอ
         document.addEventListener('visibilitychange', ()=>{
-            if(document.visibilityState==='visible' && !isPaused && persistentAudio.src && persistentAudio.paused && currentTextArray.length>0){
-                persistentAudio.play().catch(()=>{});
+            if(document.visibilityState==='hidden'){
+                // กรณีซ่อนแอป Web Worker จะคอยกระตุ้นต่อ
+            } else if(document.visibilityState==='visible'){
+                if(!isPaused && persistentAudio.src && persistentAudio.paused && currentTextArray.length>0){
+                    persistentAudio.play().catch(()=>{});
+                }
             }
         });
 
         ttsPlay.addEventListener('click', ()=>{
             if(isDownloading) return;
-            // ดึงข้อความจากช่องผลลัพธ์เป็นหลัก ถ้าไม่มีให้เอาจากช่องข้อมูล
             const rawText = outputArea.value.trim() || inputArea.value.trim();
             const fil = filterTextToSpeak(rawText);
             if(!fil){ setStatus('กรุณาเตรียมข้อความในช่องก่อนนะคะ!'); return; }
+            
+            // ใช้ Web Audio API เล่นเสียงเปล่าๆ หนึ่งครั้งเพื่อปลดล็อกนโยบายเบราว์เซอร์
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if(AudioContext){
+                const ctx = new AudioContext();
+                ctx.resume();
+            }
+            keepAliveAudio.play().catch(()=>{});
+
             currentTextArray = chunkText(fil, 120);
             if(currentTextArray.length===0) currentTextArray=[fil];
             stopSpeaking();
@@ -613,9 +405,11 @@
             if(!persistentAudio.paused && persistentAudio.src){
                 persistentAudio.pause(); isPaused=true; setStatus('หยุดพักแล้วค่ะ');
                 if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='paused';}catch(e){}}
+                stopBackgroundKeepAlive();
             } else if(isPaused){
                 isPaused=false; setStatus('กำลังอ่านต่อค่ะ...', true);
                 if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='playing';}catch(e){}}
+                startBackgroundKeepAlive();
                 persistentAudio.play().catch(()=>{ playFromIndex(currentIndex); });
             }
         });
@@ -628,6 +422,8 @@
             
             stopSpeaking();
             isDownloading = true;
+            startBackgroundKeepAlive(); // กระตุ้น Worker ระหว่างโหลด
+            
             ttsDownload.classList.add('opacity-60');
             ttsDownload.style.pointerEvents = 'none';
             setStatus('เตรียมไฟล์เสียง...', true);
@@ -658,11 +454,13 @@
                         }catch(e){
                             retries++;
                             if(retries>=3) throw e;
-                            await new Promise(r=>setTimeout(r, 800*retries));
+                            await new Promise(r=>setTimeout(r, 800*retries)); // รอแล้วลองใหม่
                         }
                     }
                     if(blob) blobs.push(blob);
-                    await new Promise(r=>setTimeout(r, 600));
+                    
+                    // เพิ่มดีเลย์และใช้ async เพื่อไม่ให้เบราว์เซอร์มองว่า thread นิ่งและถูกระงับ
+                    await new Promise(r=>setTimeout(r, 800));
                 }
                 
                 if(blobs.length===0) throw new Error('ไม่ได้ไฟล์เสียงเลย');
@@ -686,6 +484,7 @@
                 downloadText.textContent = 'ลองใหม่';
             }finally{
                 isDownloading = false;
+                stopBackgroundKeepAlive(); // หยุด Worker เมื่อเสร็จ
                 ttsDownload.classList.remove('opacity-60');
                 ttsDownload.style.pointerEvents = 'auto';
                 setTimeout(()=>{
@@ -695,7 +494,6 @@
                 }, 2500);
             }
         });
-
 
         // =========================================================
         // ฟังก์ชันจัดการข้อความ (ส่วนที่นำมาจากโค้ดเก่า)
@@ -823,7 +621,6 @@
                 case 'removeNumbers': text = text.replace(/[0-9๐-๙]/g, ''); break;
                 case 'removeEnglish': text = text.replace(/[a-zA-Z]/g, ''); break;
                 
-                // ซ่อมโค้ดแปลงตัวเลขที่ถูกตัดขาดไปให้สมบูรณ์
                 case 'toThaiNumbers':
                     text = text.replace(/[0-9]/g, m => ({
                         '0':'๐', '1':'๑', '2':'๒', '3':'๓', '4':'๔',
