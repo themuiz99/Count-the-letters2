@@ -34,6 +34,7 @@
         .box-container { display: flex; flex-direction: column; flex: 1; background: var(--bg-card); border-radius: 8px; padding: 8px; border: 1px solid var(--border); position: relative; min-height: 0; }
         .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 13px; flex-shrink: 0; }
         .btn-group-small button { background: var(--btn-bg); color: var(--text-main); border: none; padding: 2px 6px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: 0.2s; }
+        .btn-upload { background: #1976d2 !important; color: #fff !important; border: 1px solid #0d47a1 !important; }
         .btn-undo { background: #f57c00 !important; color: #fff !important; border: 1px solid #e65100 !important; }
         .btn-danger { background: #d32f2f !important; color: #fff !important; border: 1px solid #b71c1c !important; }
         .btn-success { background: #2e7d32 !important; color: #fff !important; border: 1px solid #1b5e20 !important; }
@@ -81,6 +82,10 @@
                 <div class="box-header">
                     <span>ช่องกรอกข้อมูล</span>
                     <div class="btn-group-small">
+                        <!-- ปุ่มอัปโหลดไฟล์ และ input file ที่ถูกซ่อนไว้ -->
+                        <button onclick="document.getElementById('file-upload').click()" class="btn-upload">📂 อัปโหลดไฟล์</button>
+                        <input type="file" id="file-upload" accept=".txt,.md,.csv,.html,.json,.xml" style="display: none;" onchange="handleFileUpload(event)">
+                        
                         <button onclick="undo()" class="btn-undo">ย้อนกลับ</button>
                         <button onclick="clearText()" class="btn-danger">ล้างข้อความ</button>
                     </div>
@@ -218,6 +223,20 @@
             a.href = URL.createObjectURL(blob);
             a.download = `TheMuiz_Document_${new Date().getTime()}.${format}`;
             a.click();
+        }
+
+        // ฟังก์ชันจัดการการอัปโหลดไฟล์
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                inputArea.value = e.target.result;
+                processOutput(); // สั่งให้ระบบอัปเดตข้อความและนับจำนวนอักษร
+                event.target.value = ''; // รีเซ็ต input เพื่อให้อัปโหลดไฟล์เดิมซ้ำได้ถ้าต้องการ
+            };
+            reader.readAsText(file);
         }
 
         // =========================================================
