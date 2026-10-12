@@ -25,26 +25,64 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding: 8px; }
-        .header { text-align: center; margin-bottom: 5px; flex-shrink: 0; }
+        .header { text-align: center; margin-bottom: 4px; flex-shrink: 0; }
         .site-title { font-family: 'Pattaya', sans-serif; font-size: 24px; background: linear-gradient(45deg, var(--accent), #ff79c6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin: 0; line-height: 1.1; }
         .site-subtitle { font-size: 12px; color: var(--text-muted); }
-        .workspace { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 8px; }
+        .workspace { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 6px; }
         @media (min-width: 768px) { .workspace { flex-direction: row; } }
-        .text-section { display: flex; flex-direction: column; flex: 2; gap: 8px; min-height: 0; }
-        .box-container { display: flex; flex-direction: column; flex: 1; background: var(--bg-card); border-radius: 8px; padding: 8px; border: 1px solid var(--border); position: relative; min-height: 0; }
-        .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 13px; flex-shrink: 0; }
-        .btn-group-small button { background: var(--btn-bg); color: var(--text-main); border: none; padding: 2px 6px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: 0.2s; }
-        .btn-upload { background: #1976d2 !important; color: #fff !important; border: 1px solid #0d47a1 !important; }
-        .btn-undo { background: #f57c00 !important; color: #fff !important; border: 1px solid #e65100 !important; }
-        .btn-danger { background: #d32f2f !important; color: #fff !important; border: 1px solid #b71c1c !important; }
+        .text-section { display: flex; flex-direction: column; flex: 2; gap: 6px; min-height: 0; }
+        .box-container { display: flex; flex-direction: column; flex: 1; background: var(--bg-card); border-radius: 8px; padding: 6px; border: 1px solid var(--border); position: relative; min-height: 0; }
+        
+        /* ปรับส่วนหัวให้ปุ่มขยายเต็มพื้นที่จนชิดขอบขวาพอดี */
+        .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; font-size: 13px; flex-shrink: 0; gap: 4px; width: 100%; }
+        .box-header > span { flex-shrink: 0; }
+        .btn-group-small { display: flex; gap: 2px; flex: 1; min-width: 0; margin-left: 4px; }
+        .btn-group-small button { color: #fff; border: none; padding: 4px 1px; border-radius: 4px; font-size: 10px; cursor: pointer; transition: 0.2s; text-align: center; white-space: nowrap; }
+        
+        /* กำหนดสัดส่วนความกว้างตามความเหมาะสมของข้อความและสีสากลที่แตกต่างกันชัดเจน */
+        .btn-upload { background: #2563eb !important; flex: 1.25; }
+        .btn-save-result { background: #059669 !important; flex: 1.35; }
+        .btn-undo { background: #d97706 !important; flex: 0.8; }
+        .btn-redo { background: #7c3aed !important; flex: 0.8; }
+        .btn-danger { background: #dc2626 !important; flex: 0.8; }
+
         .btn-success { background: #2e7d32 !important; color: #fff !important; border: 1px solid #1b5e20 !important; }
         .textarea-wrapper { position: relative; flex: 1; display: flex; min-height: 0; }
-        textarea { width: 100%; height: 100%; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 14px; resize: none; outline: none; overflow-y: auto; }
-        .char-count { position: absolute; bottom: 4px; right: 8px; font-size: 10px; color: var(--text-muted); background: rgba(42, 42, 42, 0.8); padding: 1px 4px; border-radius: 4px; }
-        .custom-remove-sec { display: flex; align-items: center; gap: 8px; background: var(--bg-card); padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; font-size: 13px; }
-        .custom-remove-sec input { flex: 1; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; outline: none; }
+        textarea { width: 100%; height: 100%; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 6px; font-size: 14px; resize: none; outline: none; overflow-y: auto; }
+        .char-count { position: absolute; bottom: 3px; right: 6px; font-size: 10px; color: var(--text-muted); background: rgba(42, 42, 42, 0.8); padding: 1px 4px; border-radius: 4px; }
+        .custom-remove-sec { display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 4px 8px; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; font-size: 13px; }
+        .custom-remove-sec input { flex: 1; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); padding: 3px 6px; border-radius: 4px; outline: none; }
+        
         .tools-section { background: var(--bg-card); border-radius: 8px; padding: 6px; border: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; flex: 1; }
-        .tools-title { font-size: 12px; color: var(--accent); text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 2px; margin-top: 4px; }
+        .tools-title { font-size: 12px; color: var(--accent); text-align: center; margin-bottom: 2px; }
+        
+        .tts-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin-bottom: 4px;
+            font-size: 11px;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .tts-status-bar.active {
+            border-color: var(--accent);
+            color: var(--text-main);
+            background: rgba(187, 134, 252, 0.05);
+        }
+
+        .section-divider {
+            height: 1px;
+            background-color: #ffffff;
+            opacity: 0.25;
+            margin: 4px 0;
+        }
+
         .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
         .tool-btn { color: #fff; border: 1px solid transparent; padding: 5px 2px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s; text-align: center; }
         .tool-btn:hover { filter: brightness(1.1); }
@@ -54,6 +92,7 @@
         .btn-c13 { background: #4527a0; } .btn-c14 { background: #6a1b9a; } .btn-c15 { background: #ad1457; } .btn-c16 { background: #4e342e; }
         .btn-c17 { background: #bf360c; } .btn-c18 { background: #7b1fa2; } .btn-c19 { background: #004d40; } .btn-c20 { background: #01579b; }
         .btn-play { background: #7c3aed; } .btn-pause { background: #4b5563; } .btn-download-mp3 { background: #10b981; position: relative; overflow: hidden; }
+        
         .footer { text-align: center; margin-top: 2px; font-size: 9px; color: var(--text-muted); }
         #toast { visibility: hidden; min-width: 150px; background-color: #4caf50; color: #fff; text-align: center; border-radius: 8px; padding: 8px; position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 12px; z-index: 999; }
         #toast.show { visibility: visible; opacity: 1; }
@@ -82,12 +121,13 @@
                 <div class="box-header">
                     <span>ช่องกรอกข้อมูล</span>
                     <div class="btn-group-small">
-                        <!-- ปุ่มอัปโหลดไฟล์ และ input file ที่ถูกซ่อนไว้ -->
-                        <button onclick="document.getElementById('file-upload').click()" class="btn-upload">📂 อัปโหลดไฟล์</button>
+                        <button onclick="document.getElementById('file-upload').click()" class="btn-upload">📂 อัปโหลด</button>
                         <input type="file" id="file-upload" accept=".txt,.md,.csv,.html,.json,.xml" style="display: none;" onchange="handleFileUpload(event)">
                         
-                        <button onclick="undo()" class="btn-undo">ย้อนกลับ</button>
-                        <button onclick="clearText()" class="btn-danger">ล้างข้อความ</button>
+                        <button onclick="saveResult()" class="btn-save-result" title="บันทึกผลลัพธ์ไปที่ช่องกรอกข้อมูล">💾 บันทึกผล</button>
+                        <button onclick="undo()" class="btn-undo" title="ย้อนกลับ (พลิกหนังสือถอยหลัง)">⬅️ ย้อน</button>
+                        <button onclick="redo()" class="btn-redo" title="ไปข้างหน้า (พลิกหนังสือเดินหน้า)">➡️ หน้า</button>
+                        <button onclick="clearText()" class="btn-danger" title="ล้างข้อความทั้งหมด">🗑️ ล้าง</button>
                     </div>
                 </div>
                 <div class="textarea-wrapper">
@@ -103,7 +143,7 @@
 
             <div class="box-container">
                 <div class="box-header">
-                    <span>ช่องแสดงผลลัพธ์ (ใช้อ่านออกเสียง)</span>
+                    <span>ช่องแสดงผลลัพธ์</span>
                     <div class="save-document-section">
                         <button onclick="copyOutput()" class="btn-success">คัดลอกข้อความ</button>
                         <select id="document-format" title="เลือกรูปแบบไฟล์">
@@ -127,7 +167,13 @@
 
         <div class="tools-section">
             <div class="tools-title">เครื่องมืออ่านออกเสียง (MP3)</div>
-            <div class="tools-grid" style="margin-bottom: 5px;">
+            
+            <div id="ttsStatusBar" class="tts-status-bar">
+                <div id="ttsLoader" class="loader"></div>
+                <span id="ttsStatus">พร้อมใช้งาน (ใช้เสียงผู้หญิงมาตรฐาน)</span>
+            </div>
+
+            <div class="tools-grid" style="margin-bottom: 2px;">
                 <button id="ttsPlay" class="tool-btn btn-play">🔊 อ่านออกเสียง</button>
                 <button id="ttsPause" class="tool-btn btn-pause">⏸️ หยุด / ต่อ</button>
                 <button id="ttsDownload" class="tool-btn btn-download-mp3" style="grid-column: span 2;">
@@ -135,10 +181,8 @@
                     <div id="downloadProgress" style="position: absolute; left: 0; bottom: 0; height: 3px; background: rgba(255,255,255,0.8); width: 0%; transition: all 0.3s;"></div>
                 </button>
             </div>
-            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 11px; color: var(--text-muted);">
-                <div id="ttsLoader" class="loader" style="margin-right: 6px;"></div>
-                <span id="ttsStatus">พร้อมใช้งาน (ใช้เสียงผู้หญิงมาตรฐาน)</span>
-            </div>
+
+            <div class="section-divider"></div>
 
             <div class="tools-title">เครื่องมือจัดการข้อความ</div>
             <div class="tools-grid">
@@ -166,6 +210,18 @@
         </div>
     </div>
 
+    <!-- Modal ยืนยันการล้างข้อความ -->
+    <div id="confirmModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; width: 280px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+            <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px; color: var(--text-main);">ยืนยันการล้างข้อความ</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">คุณต้องการล้างข้อความทั้งหมดและล้างประวัติความจำจริงๆ ใช่ไหม?</div>
+            <div style="display: flex; gap: 8px; justify-content: center;">
+                <button onclick="closeConfirmModal()" style="background: var(--btn-bg); color: var(--text-main); border: none; padding: 5px 12px; border-radius: 4px; font-size: 11px; cursor: pointer;">ยกเลิก</button>
+                <button onclick="executeClearText()" style="background: #d32f2f; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; font-size: 11px; cursor: pointer;">ยืนยันล้าง</button>
+            </div>
+        </div>
+    </div>
+
     <div class="footer">&copy; สงวนลิขสิทธิ์โดย TheMuiz × หนูมะลิ</div>
     <div id="toast">คัดลอกข้อความสำเร็จ!</div>
 
@@ -177,29 +233,111 @@
         const outputCount = document.getElementById('output-count');
         const toast = document.getElementById('toast');
 
-        let outputHistory = [""];
+        let historyStack = [];
+        let historyIndex = -1;
+        let isRestoring = false;
 
-        function saveState(text) {
-            if (outputHistory[outputHistory.length - 1] !== text) {
-                outputHistory.push(text);
+        function pushState() {
+            if (isRestoring) return;
+            const currentState = {
+                input: inputArea.value,
+                output: outputArea.value,
+                removeInput: customRemoveInput.value
+            };
+            if (historyIndex >= 0) {
+                const last = historyStack[historyIndex];
+                if (last.input === currentState.input && last.output === currentState.output && last.removeInput === currentState.removeInput) {
+                    return;
+                }
             }
+            historyStack = historyStack.slice(0, historyIndex + 1);
+            historyStack.push(currentState);
+            historyIndex = historyStack.length - 1;
+        }
+
+        function restoreState(index) {
+            if (index < 0 || index >= historyStack.length) return;
+            isRestoring = true;
+            historyIndex = index;
+            const state = historyStack[historyIndex];
+            inputArea.value = state.input;
+            outputArea.value = state.output;
+            customRemoveInput.value = state.removeInput || "";
+            inputCount.innerText = `${inputArea.value.length} อักษร`;
+            outputCount.innerText = `${outputArea.value.length} อักษร`;
+            isRestoring = false;
         }
 
         function undo() {
-            if (outputHistory.length > 1) {
-                outputHistory.pop();
-                const previousState = outputHistory[outputHistory.length - 1];
-                outputArea.value = previousState;
-                outputCount.innerText = `${outputArea.value.length} อักษร`;
+            if (historyIndex > 0) {
+                restoreState(historyIndex - 1);
+                showToast("ย้อนกลับ 1 หน้า");
+            } else {
+                showToast("อยู่ที่หน้าแรกแล้ว");
             }
         }
 
+        function redo() {
+            if (historyIndex < historyStack.length - 1) {
+                restoreState(historyIndex + 1);
+                showToast("ไปข้างหน้า 1 หน้า");
+            } else {
+                showToast("อยู่ที่หน้าล่าสุดแล้ว");
+            }
+        }
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.className = "show";
+            setTimeout(() => toast.className = "", 1500);
+        }
+
+        function saveResult() {
+            const currentOutput = outputArea.value;
+            if (!currentOutput) {
+                alert('ไม่มีผลลัพธ์ในช่องแสดงผลให้บันทึกค่ะ');
+                return;
+            }
+            inputArea.value = currentOutput;
+            processOutput();
+            showToast("บันทึกผลลัพธ์ไปที่ช่องกรอกสำเร็จ!");
+        }
+
         function clearText() {
-            outputHistory = [""];
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+        }
+
+        function executeClearText() {
+            closeConfirmModal();
+            stopSpeaking(true);
+            isDownloading = false;
+            audioCache.clear();
+            if(preloadAbortController) {
+                preloadAbortController.abort();
+                preloadAbortController = null;
+            }
+
+            historyStack = [];
+            historyIndex = -1;
             inputArea.value = "";
             outputArea.value = "";
+            customRemoveInput.value = "";
             inputCount.innerText = "0 อักษร";
             outputCount.innerText = "0 อักษร";
+            setStatus('พร้อมใช้งาน (ใช้เสียงผู้หญิงมาตรฐาน)');
+            
+            downloadProgress.style.width = '0%';
+            downloadText.textContent = '💾 บันทึกไฟล์เสียง MP3';
+            ttsLoader.style.display = 'none';
+            ttsDownload.classList.remove('opacity-60');
+            ttsDownload.style.pointerEvents = 'auto';
+
+            pushState();
+            showToast("ล้างข้อความและประวัติทั้งหมดแล้ว");
         }
 
         function copyOutput() {
@@ -209,9 +347,7 @@
             t.select();
             document.execCommand('copy');
             document.body.removeChild(t);
-            toast.innerText = "คัดลอกข้อความสำเร็จ!";
-            toast.className = "show";
-            setTimeout(() => toast.className = "", 2000);
+            showToast("คัดลอกข้อความสำเร็จ!");
         }
 
         function saveDocument() {
@@ -225,7 +361,6 @@
             a.click();
         }
 
-        // ฟังก์ชันจัดการการอัปโหลดไฟล์
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -233,15 +368,12 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 inputArea.value = e.target.result;
-                processOutput(); // สั่งให้ระบบอัปเดตข้อความและนับจำนวนอักษร
-                event.target.value = ''; // รีเซ็ต input เพื่อให้อัปโหลดไฟล์เดิมซ้ำได้ถ้าต้องการ
+                processOutput();
+                event.target.value = '';
             };
             reader.readAsText(file);
         }
 
-        // =========================================================
-        // เทคนิค Web Worker + Keep Alive หลอกระบบแอนดรอยด์ Web-to-App
-        // =========================================================
         const keepAliveAudio = document.getElementById('keepAliveAudio');
         let workerBlob = new Blob([`
             let intervalId = null;
@@ -274,7 +406,6 @@
             }
         }
 
-        // Worker ช่วยกระตุ้นระบบไม่ให้หยุดทำงานตอนหน้าจอดับหรือซ่อนแอป
         backgroundWorker.onmessage = function(e) {
             if (e.data === 'tick') {
                 if (!isPaused && persistentAudio.paused && persistentAudio.src && currentTextArray.length > 0) {
@@ -283,31 +414,37 @@
             }
         };
 
-        // =========================================================
-        // ฟังก์ชันอ่านออกเสียงและบันทึก MP3
-        // =========================================================
         const ttsPlay = document.getElementById('ttsPlay');
         const ttsPause = document.getElementById('ttsPause');
         const ttsDownload = document.getElementById('ttsDownload');
         const downloadText = document.getElementById('downloadText');
         const downloadProgress = document.getElementById('downloadProgress');
         const ttsStatus = document.getElementById('ttsStatus');
+        const ttsStatusBar = document.getElementById('ttsStatusBar');
         const ttsLoader = document.getElementById('ttsLoader');
         const persistentAudio = document.getElementById('persistentAudio');
 
         let isPaused = false, currentTextArray = [], currentIndex = 0, isDownloading = false;
-        const apiKey = 'Negu9VLC'; // เสียงผู้หญิง
+        const apiKey = 'Negu9VLC';
+
+        const audioCache = new Map();
+        let preloadAbortController = null;
 
         function setStatus(m, loading=false) {
             ttsStatus.textContent = m;
             ttsLoader.style.display = loading ? 'block' : 'none';
+            if(loading || m.includes('กำลัง')) {
+                ttsStatusBar.classList.add('active');
+            } else {
+                ttsStatusBar.classList.remove('active');
+            }
         }
 
         function filterTextToSpeak(text){ return text.replace(/[^ก-๙a-zA-Z0-9\s\n]/g,''); }
 
         function buildTTSUrl(t) {
             const clean = t.replace(/\s+/g,' ').trim();
-            return `https://code.responsivevoice.org/getvoice.php?t=${encodeURIComponent(clean)}&tl=th&sv=g2&vn=&pitch=0.5&rate=1&vol=1&key=${apiKey}&cf=mp3`;
+            return `https://code.responsivevoice.org/getvoice.php?t=${encodeURIComponent(clean)}&tl=th&sv=g2&vn=&pitch=0.5&rate=1.35&vol=1&key=${apiKey}&cf=mp3`;
         }
 
         function chunkText(t,m) {
@@ -338,14 +475,41 @@
             persistentAudio.pause();
             try{ persistentAudio.removeAttribute('src'); persistentAudio.load(); }catch(e){}
             if('mediaSession' in navigator){ try{ navigator.mediaSession.playbackState='none'; }catch(e){} }
-            if(reset){ isPaused=false; currentIndex=0; }
+            if(reset){ isPaused=false; currentIndex=0; currentTextArray=[]; }
             stopBackgroundKeepAlive();
         }
 
-        function playFromIndex(i) {
+        async function preloadChunks(startIndex, signal) {
+            for (let i = startIndex; i < Math.min(startIndex + 3, currentTextArray.length); i++) {
+                if (signal && signal.aborted) break;
+                if (!audioCache.has(i)) {
+                    const textChunk = currentTextArray[i].replace(/\s+/g,' ').trim();
+                    if (!textChunk) continue;
+                    const url = buildTTSUrl(textChunk);
+                    try {
+                        const response = await fetch(url, { mode: 'cors', cache: 'no-cache', signal });
+                        if (response.ok) {
+                            const blob = await response.blob();
+                            if (blob.size >= 500) {
+                                const blobUrl = URL.createObjectURL(blob);
+                                audioCache.set(i, blobUrl);
+                            }
+                        }
+                    } catch (err) {
+                        if (err.name === 'AbortError') break;
+                    }
+                }
+            }
+        }
+
+        async function playFromIndex(i) {
             if(i >= currentTextArray.length){
-                setStatus('อ่านจบแล้วค่ะ! 🎉');
-                isPaused = false; currentIndex = 0;
+                setStatus('พร้อมใช้งาน (ใช้เสียงผู้หญิงมาตรฐาน)');
+                isPaused = false; 
+                currentIndex = 0;
+                currentTextArray = [];
+                persistentAudio.removeAttribute('src');
+                persistentAudio.load();
                 if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='none';}catch(e){}}
                 stopBackgroundKeepAlive();
                 return;
@@ -354,7 +518,27 @@
             const textChunk = currentTextArray[currentIndex].replace(/\s+/g,' ').trim();
             if(!textChunk){ playFromIndex(currentIndex+1); return; }
 
-            persistentAudio.src = buildTTSUrl(textChunk);
+            setStatus(`กำลังอ่าน... (${currentIndex+1}/${currentTextArray.length})`, true);
+            startBackgroundKeepAlive();
+
+            let audioSourceUrl = audioCache.get(currentIndex);
+            if (!audioSourceUrl) {
+                const url = buildTTSUrl(textChunk);
+                try {
+                    const r = await fetch(url, { mode: 'cors', cache: 'no-cache' });
+                    if (r.ok) {
+                        const blob = await r.blob();
+                        audioSourceUrl = URL.createObjectURL(blob);
+                        audioCache.set(currentIndex, audioSourceUrl);
+                    } else {
+                        audioSourceUrl = url;
+                    }
+                } catch (e) {
+                    audioSourceUrl = url;
+                }
+            }
+
+            persistentAudio.src = audioSourceUrl;
             persistentAudio.load();
 
             if('mediaSession' in navigator){
@@ -367,12 +551,16 @@
                     navigator.mediaSession.playbackState = 'playing';
                 }catch(e){}
             }
-            setStatus(`กำลังอ่าน... (${currentIndex+1}/${currentTextArray.length})`, true);
-            startBackgroundKeepAlive(); // กระตุ้นแอป
-            
+
             persistentAudio.play().catch(err=>{
                 setStatus('แตะปุ่มเล่นอีกครั้งเพื่อเล่นต่อค่ะ');
             });
+
+            if (preloadAbortController) {
+                preloadAbortController.abort();
+            }
+            preloadAbortController = new AbortController();
+            preloadChunks(currentIndex + 1, preloadAbortController.signal);
         }
 
         persistentAudio.addEventListener('ended', ()=>{ if(!isPaused) playFromIndex(currentIndex+1); });
@@ -388,11 +576,8 @@
             }catch(e){}
         }
 
-        // ดักจับจังหวะการเปลี่ยนแอปหรือปิดจอ
         document.addEventListener('visibilitychange', ()=>{
-            if(document.visibilityState==='hidden'){
-                // กรณีซ่อนแอป Web Worker จะคอยกระตุ้นต่อ
-            } else if(document.visibilityState==='visible'){
+            if(document.visibilityState==='visible'){
                 if(!isPaused && persistentAudio.src && persistentAudio.paused && currentTextArray.length>0){
                     persistentAudio.play().catch(()=>{});
                 }
@@ -405,7 +590,8 @@
             const fil = filterTextToSpeak(rawText);
             if(!fil){ setStatus('กรุณาเตรียมข้อความในช่องก่อนนะคะ!'); return; }
             
-            // ใช้ Web Audio API เล่นเสียงเปล่าๆ หนึ่งครั้งเพื่อปลดล็อกนโยบายเบราว์เซอร์
+            audioCache.clear();
+
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if(AudioContext){
                 const ctx = new AudioContext();
@@ -415,7 +601,7 @@
 
             currentTextArray = chunkText(fil, 120);
             if(currentTextArray.length===0) currentTextArray=[fil];
-            stopSpeaking();
+            stopSpeaking(false);
             playFromIndex(0);
         });
 
@@ -441,7 +627,7 @@
             
             stopSpeaking();
             isDownloading = true;
-            startBackgroundKeepAlive(); // กระตุ้น Worker ระหว่างโหลด
+            startBackgroundKeepAlive();
             
             ttsDownload.classList.add('opacity-60');
             ttsDownload.style.pointerEvents = 'none';
@@ -455,6 +641,7 @@
 
             try {
                 for(let i=0; i<total; i++) {
+                    if (!isDownloading) break;
                     setStatus(`กำลังโหลดส่วนที่ ${i+1}/${total}...`, true);
                     downloadProgress.style.width = `${((i+1)/total)*100}%`;
                     downloadText.textContent = `${Math.round(((i+1)/total)*100)}% • ${i+1}/${total}`;
@@ -463,7 +650,7 @@
                     
                     const url = buildTTSUrl(clean);
                     let retries = 0, blob = null;
-                    while(retries < 3){
+                    while(retries < 3 && isDownloading){
                         try {
                             const r = await fetch(url, {mode:'cors', cache:'no-cache'});
                             if(!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -473,15 +660,17 @@
                         }catch(e){
                             retries++;
                             if(retries>=3) throw e;
-                            await new Promise(r=>setTimeout(r, 800*retries)); // รอแล้วลองใหม่
+                            await new Promise(r=>setTimeout(r, 800*retries));
                         }
                     }
+                    if(!isDownloading) break;
                     if(blob) blobs.push(blob);
                     
-                    // เพิ่มดีเลย์และใช้ async เพื่อไม่ให้เบราว์เซอร์มองว่า thread นิ่งและถูกระงับ
                     await new Promise(r=>setTimeout(r, 800));
                 }
                 
+                if(!isDownloading) return;
+
                 if(blobs.length===0) throw new Error('ไม่ได้ไฟล์เสียงเลย');
                 setStatus('กำลังรวมไฟล์...', true);
                 downloadText.textContent = 'กำลังรวมไฟล์...';
@@ -498,25 +687,25 @@
                 setStatus(`บันทึกสำเร็จ! ${total} ส่วน • ${Math.round(finalBlob.size/1024)} KB 🎉`);
                 downloadText.textContent = 'บันทึกสำเร็จ!';
             }catch(err){
-                console.error(err);
-                setStatus(`ผิดพลาด: ${err.message}`);
-                downloadText.textContent = 'ลองใหม่';
+                if(isDownloading) {
+                    console.error(err);
+                    setStatus(`ผิดพลาด: ${err.message}`);
+                    downloadText.textContent = 'ลองใหม่';
+                }
             }finally{
                 isDownloading = false;
-                stopBackgroundKeepAlive(); // หยุด Worker เมื่อเสร็จ
+                stopBackgroundKeepAlive();
                 ttsDownload.classList.remove('opacity-60');
                 ttsDownload.style.pointerEvents = 'auto';
                 setTimeout(()=>{
-                    downloadProgress.style.width = '0%';
-                    downloadText.textContent = '💾 บันทึกไฟล์เสียง MP3';
-                    ttsLoader.style.display = 'none';
+                    if (!isDownloading && downloadText.textContent !== 'บันทึกสำเร็จ!') {
+                        downloadProgress.style.width = '0%';
+                        downloadText.textContent = '💾 บันทึกไฟล์เสียง MP3';
+                        setStatus('พร้อมใช้งาน (ใช้เสียงผู้หญิงมาตรฐาน)');
+                    }
                 }, 2500);
             }
         });
-
-        // =========================================================
-        // ฟังก์ชันจัดการข้อความ (ส่วนที่นำมาจากโค้ดเก่า)
-        // =========================================================
 
         function arabicToThaiText(numberStr) {
             let cleanNum = numberStr.replace(/,/g, '');
@@ -619,7 +808,7 @@
             outputArea.value = text;
             inputCount.innerText = `${inputArea.value.length} อักษร`;
             outputCount.innerText = `${outputArea.value.length} อักษร`;
-            saveState(text);
+            pushState();
         }
 
         inputArea.addEventListener('input', () => { processOutput(); });
@@ -674,8 +863,12 @@
             outputArea.value = text;
             inputCount.innerText = `${inputArea.value.length} อักษร`;
             outputCount.innerText = `${outputArea.value.length} อักษร`;
-            saveState(text);
+            pushState();
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            pushState();
+        });
     </script>
 </body>
 </html>
