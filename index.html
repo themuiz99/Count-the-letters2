@@ -205,6 +205,7 @@
                 <button class="tool-btn btn-c16" onclick="applyTool('reverseText')">กลับหลังหันข้อความ</button>
                 <button class="tool-btn btn-c17" onclick="applyTool('removeLinks')">ลบลิงก์ (URL)</button>
                 <button class="tool-btn btn-c19" onclick="applyTool('removeAIReferences')">ลบแหล่งอ้างอิง AI</button>
+                <button class="tool-btn" onclick="applyTool('removeReferencesAll')" style="grid-column: span 2; background: #7c3aed;">ลบแหล่งอ้างอิงAll</button>
                 <button class="tool-btn btn-c20" onclick="applyTool('convertNumbersToThaiText')" style="grid-column: span 2;">แปลงเป็นตัวอักษรทั้งหมด</button>
             </div>
         </div>
@@ -798,6 +799,134 @@
             });
         }
 
+        // Helpers สำหรับลบแหล่งอ้างอิงAll (Robust Cleaner)
+        const REF_HEADING = /^[ \t]*(?:#{1,6}[ \t]*)?[*_]{0,3}[ \t]*(?:แหล่งอ้างอิง|แหล่งที่มา|แหล่งข้อมูลอ้างอิง|เอกสารอ้างอิง|รายการอ้างอิง|บรรณานุกรม|เชิงอรรถ|อ้างอิง|ที่มา|references?|sources?|bibliography|works cited|citations?|footnotes?|notes and references)[ \t]*[:：]?[*_]{0,3}[ \t]*$/i;
+        const STOP_LATIN = new Set(['in','since','by','until','till','during','from','to','circa','ca','year','early','late','mid','about','around','after','before','between','as','of','the','and','or','an','on','at','for','with','jan','feb','mar','apr','may','jun','jul','aug','sep','sept','oct','nov','dec','january','february','march','april','june','july','august','september','october','november','december','fig','figure','table','vol','no','issue','ed','edition','page','p','pp']);
+        const STOP_THAI = ['ปี','พ.ศ.','ค.ศ.','เมื่อ','ใน','ตั้งแต่','ช่วง','ภายใน','ถึง','ราว','ประมาณ','เดือน','วันที่','จนถึง','หลัง','ก่อน','ระหว่าง','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.','ราคา','จำนวน','รุ่น','ฉบับ','ครั้งที่'];
+        const YEAR_PART = '(?:(?:1[5-9]|20)\\d{2}|2[3-6]\\d{2})[a-zA-Zก-ฮ]?|n\\.d\\.|ม\\.ป\\.ป\\.|in press|forthcoming';
+        const CITATION_UNIT = new RegExp('^(.{2,100}?)(,?)\\s*(' + YEAR_PART + ')((?:\\s*[,:]\\s*(?:pp?\\.?\\s*|น\\.\\s*|หน้า\\s*)?\\d+(?:\\s*[-–—]\\s*\\d+)?)?)$', 'iu');
+
+        function isCitationUnit(part) {
+            const p = part.trim().replace(/^(?:see also|see|cf\.?|e\.g\.,?|i\.e\.,?|ดูเพิ่มเติม|ดู|เช่น)\s+/i, '');
+            const m = p.match(CITATION_UNIT);
+            if (!m) return false;
+            const name = m[1].trim();
+            const hasComma = m[2] === ',';
+            const pages = (m[4] || '').trim();
+            if (!/^[\p{L}\p{M}\s.,'’&\-]+$/u.test(name)) return false;
+            if (name.split(/\s+/).length > 10) return false;
+            const first = name.split(/\s+/)[0].replace(/[.,]+$/, '').toLowerCase();
+            if (STOP_LATIN.has(first)) return false;
+            if (STOP_THAI.some(w => name.startsWith(w))) return false;
+            const isThai = /[\u0E00-\u0E7F]/.test(name);
+            const isLatin = /^[A-Z\u00C0-\u00DE]/.test(name);
+            if (!isThai && !isLatin) return false;
+            const strong = /et\s+al|&|\band\b|และ/i.test(name) || pages !== '';
+            return hasComma || strong;
+        }
+
+        function isAuthorYearCitation(inner) {
+            const parts = inner.split(/\s*;\s*/).filter(p => p.trim());
+            return parts.length > 0 && parts.every(isCitationUnit);
+        }
+
+        function referenceLineScore(line) {
+            const s = line.trim();
+            if (!s) return 0;
+            if (/(?:https?:\/\/|www\.)\S+/i.test(s) || /10\.\d{4,9}\//.test(s) || /\[[^\]]+\]\([^)]+\)/.test(s) || /\(\s*(?:(?:1[5-9]|20)\d{2}|2[3-6]\d{2})[a-z]?\s*\)/i.test(s) || /(?:retrieved|accessed|สืบค้น)/i.test(s) || /^\[\^?[^\]\s]+\]:?\s/.test(s)) return 1;
+            if (/^(?:[-*•▪◦]\s+|\d{1,3}[.)]\s+)/.test(s)) return 0.5;
+            return 0;
+        }
+
+        function removeAllReferencesAll(text) {
+            let cleaned = text;
+            // 1. ลบสัญลักษณ์ผิดพลาด ()
+            cleaned = cleaned.replace(/\uFFFD+/g, '');
+
+            // 2. ตัดหัวข้อและรายการท้ายบทความอ้างอิง
+            const lines = cleaned.split('\n');
+            let cutIndex = -1;
+            for (let i = 0; i < lines.length; i++) {
+                if (REF_HEADING.test(lines[i])) {
+                    const tail = lines.slice(i + 1).filter(l => l.trim());
+                    const score = tail.reduce((sum, l) => sum + referenceLineScore(l), 0);
+                    if (tail.length === 0 || score / tail.length >= 0.6) {
+                        cutIndex = i;
+                        break;
+                    }
+                }
+            }
+            if (cutIndex !== -1) {
+                cleaned = lines.slice(0, cutIndex).join('\n');
+            }
+
+            // 3. บรรทัดนิยามเชิงอรรถและนิยามลิงก์
+            cleaned = cleaned.replace(/^[ \t]*\[\^[^\]\s]+\]:[ \t]*([^\n]*)$/gm, '');
+            cleaned = cleaned.replace(/^[ \t]*\[[^\]\n]+\]:[ \t]*((?:https?:\/\/|www\.)[^\n]*)$/gim, '');
+
+            // 4. ลิงก์ Markdown และ HTML
+            cleaned = cleaned.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
+            cleaned = cleaned.replace(/<a\s[^>]*?href\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, '$2');
+
+            // 5. ป้ายอ้างอิง AI
+            cleaned = cleaned.replace(/\uE200[\s\S]*?\uE201/g, '');
+            cleaned = cleaned.replace(/【[^】\n]*(?:†|\d)[^】\n]*】/g, '');
+            cleaned = cleaned.replace(/\[\s*cite(?:_start|_end)?\s*(?::[^\]\n]*)?\]/gi, '');
+            cleaned = cleaned.replace(/\[\s*\d+\s*†[^\]\n]*\]/g, '');
+            cleaned = cleaned.replace(/(?:cite)?(?:turn\d+(?:search|news|view|image|product|file|forecast|finance)\d+)+/gi, '');
+
+            // 6. วงเล็บอ้างอิงตัวเลข และเชิงอรรถ [^...]
+            cleaned = cleaned.replace(/\[\s*\d+(?:\s*[-–—]\s*\d+)?(?:\s*[,;]\s*\d+(?:\s*[-–—]\s*\d+)?)*\s*\]/g, '');
+            cleaned = cleaned.replace(/\(\s*\d+(?:\s*,\s*\d+)*\s*\)/g, '');
+            cleaned = cleaned.replace(/\[\^[^\]\s]+\]/g, '');
+
+            // 7. วงเล็บโค้งครอบวงเล็บเหลี่ยม เช่น ([แหล่งอ้างอิง])
+            cleaned = cleaned.replace(/\([^)]*\[[^\]]*\][^)]*\)/g, '');
+
+            // 8. ป้ายระบุที่มา (ที่มา: ..., Source: ...)
+            const CLOSE = '[\\)\\]）]';
+            const THAI_FREE = 'ที่มา|แหล่งที่มา|แหล่งอ้างอิง|อ้างอิงจาก|อ้างอิง|เอกสารอ้างอิง';
+            const COLON_REQ = 'แหล่งข้อมูล|ข้อมูลจาก|ภาพจาก|ที่มาภาพ|source|sources|reference|references|ref|refs|cited in|citation|credit|credits';
+            const LABELED_INLINE = new RegExp('[\\(\\[（]\\s*(?:(?:' + THAI_FREE + ')(?:\\s*[:：]\\s*|\\s+|(?=' + CLOSE + '))|(?:' + COLON_REQ + ')(?:\\s*[:：]\\s*|(?=' + CLOSE + ')))[^()\\[\\]（）\\n]{0,300}' + CLOSE, 'gi');
+            cleaned = cleaned.replace(LABELED_INLINE, '');
+            const LABELED_LINE = new RegExp('^[ \\t]*[*_]{0,3}(?:' + THAI_FREE + '|' + COLON_REQ + ')[*_]{0,3}[ \\t]*[:：][*_]*[^\\n]*$', 'gim');
+            cleaned = cleaned.replace(LABELED_LINE, '');
+
+            // 9. อ้างอิงผู้แต่ง-ปี (Author-Year)
+            cleaned = cleaned.replace(/\(([^()\[\]\n]{3,250})\)|\[([^()\[\]\n]{3,250})\]|（([^（）()\[\]\n]{3,250})）/g, (m, a, b, c) => {
+                const inner = a || b || c;
+                if (isAuthorYearCitation(inner)) return '';
+                return m;
+            });
+
+            // 10. DOI, ISBN, PMID, ArXiv และ URL ต่างๆ
+            cleaned = cleaned.replace(/(^|[\s(\["“'])((?:https?:\/\/(?:dx\.)?doi\.org\/|doi\s*:?\s*)?10\.\d{4,9}\/[^\s"'<>()\[\]]*[^\s"'<>()\[\].,;:!?])/gi, '$1');
+            cleaned = cleaned.replace(/\b(?:arxiv\s*:\s*\d{4}\.\d{4,5}(?:v\d+)?|pmid\s*:?\s*\d{5,9}|pmcid\s*:?\s*PMC\d+|isbn(?:-1[03])?\s*:?\s*[\dXx][\dXx\- ]{8,15}[\dXx])/gi, '');
+            cleaned = cleaned.replace(/[\(\[（]\s*(?:https?:\/\/|www\.)[^\s()\[\]（）]+\s*[\)\]）]/gi, '');
+            cleaned = cleaned.replace(/[\(\[（]\s*(?:[a-z0-9][a-z0-9-]*\.)+(?:com|org|net|edu|gov|mil|int|info|io|ai|co|ac|go|or|in|th|uk|jp|cn|de|fr|au|ca|kr|tv|me|news|wiki|app|dev|biz|asia|pub|press|science)(?:\/[^\s()\[\]（）]*)?\s*[\)\]）]/gi, '');
+            cleaned = cleaned.replace(/^[ \t]*(?:[-*•▪]\s+|\d{1,3}[.)]\s+)?(?:https?:\/\/|www\.)\S+[ \t]*$/gim, '');
+            cleaned = cleaned.replace(/https?:\/\/[^\s]+/g, '');
+
+            // 11. เลขยก (Superscript) และป้ายต้องการอ้างอิง
+            cleaned = cleaned.replace(/([\u0E00-\u0E7F.,;:!?)\]”"'’])([⁰¹²³⁴⁵⁶⁷⁸⁹]+(?:[,⁻][⁰¹²³⁴⁵⁶⁷⁸⁹]+)*)/g, '$1');
+            cleaned = cleaned.replace(/\[\s*(?:citation needed|ต้องการอ้างอิง|ต้องการแหล่งอ้างอิง|ต้องการแหล่งที่มา|จำเป็นต้องมีการอ้างอิง|note\s*\d+|หมายเหตุ\s*\d+|fn\s*\d+)\s*\]/gi, '');
+
+            // 12. วงเล็บว่างเปล่าที่เหลืออยู่
+            let prev;
+            do {
+                prev = cleaned;
+                cleaned = cleaned.replace(/[\(\[（]\s*[\)\]）]/g, '');
+            } while (cleaned !== prev);
+
+            // 13. จัดระเบียบช่องว่างและวรรคตอน
+            cleaned = cleaned.replace(/\s+([.,;!?])/g, '$1');
+            cleaned = cleaned.replace(/[ \t]+/g, ' ');
+            cleaned = cleaned.split('\n').map(l => l.trim()).join('\n');
+            cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+
+            return cleaned.trim();
+        }
+
         function processOutput() {
             let text = inputArea.value;
             const removeStr = customRemoveInput.value;
@@ -857,6 +986,7 @@
                 case 'reverseText': text = text.split('').reverse().join(''); break;
                 case 'removeLinks': text = text.replace(/https?:\/\/[^\s]+/g, ''); break;
                 case 'removeAIReferences': text = text.replace(/\]+\]/g, '').replace(/\[\d+\]/g, ''); break;
+                case 'removeReferencesAll': text = removeAllReferencesAll(text); break;
                 case 'convertNumbersToThaiText': text = convertNumberToTextEngine(text); break;
             }
 
