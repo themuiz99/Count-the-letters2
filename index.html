@@ -207,6 +207,7 @@
                 <button class="tool-btn btn-c19" onclick="applyTool('removeAIReferences')">ลบแหล่งอ้างอิง AI</button>
                 <button class="tool-btn" onclick="applyTool('removeReferencesAll')" style="grid-column: span 2; background: #7c3aed;">ลบแหล่งอ้างอิงAll</button>
                 <button class="tool-btn btn-c20" onclick="applyTool('convertNumbersToThaiText')" style="grid-column: span 2;">แปลงเป็นตัวอักษรทั้งหมด</button>
+                <button class="tool-btn" onclick="applyTool('convertToPlainText')" style="grid-column: span 2; background: #5EAA13;">แปลงเป็นข้อความ Plain Text</button>
             </div>
         </div>
     </div>
@@ -799,6 +800,48 @@
             });
         }
 
+        function convertToPlainTextEngine(text) {
+            if (!text) return '';
+            let str = text;
+            
+            // ลบแท็ก HTML / XML ทั้งหมด
+            str = str.replace(/<[^>]*>/g, '');
+            
+            // ถอด Code Block (```...```)
+            str = str.replace(/```[a-zA-Z]*\n?([\s\S]*?)\n?```/g, '$1');
+            
+            // ถอด Inline Code (`...`)
+            str = str.replace(/`([^`]+)`/g, '$1');
+            
+            // ถอดรูปภาพ Markdown (![alt](url)) -> เหลือเฉพาะ alt
+            str = str.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1');
+            
+            // ถอดลิงก์ Markdown ([text](url)) -> เหลือเฉพาะข้อความ text
+            str = str.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+            
+            // ถอดหัวข้อ Markdown (# Header)
+            str = str.replace(/^[ \t]*#{1,6}[ \t]+/gm, '');
+            
+            // ถอดตัวหนา ตัวเอียง ขีดฆ่า (***, **, *, __, _, ~~)
+            str = str.replace(/(\*\*|__|~~)(.*?)\1/g, '$2');
+            str = str.replace(/(\*|_)(.*?)\1/g, '$2');
+            str = str.replace(/(\*\*|__|\*|_|~~)/g, '');
+            
+            // ถอด Blockquote (> Quote)
+            str = str.replace(/^[ \t]*>[ \t]?/gm, '');
+            
+            // ถอดเส้นคั่น (---, ***, ___)
+            str = str.replace(/^[ \t]*[-*_]{3,}[ \t]*$/gm, '');
+            
+            // ถอดสัญลักษณ์รายการสัญลักษณ์ (- item, * item, + item)
+            str = str.replace(/^[ \t]*[-*+][ \t]+/gm, '');
+            
+            // ถอดตัวเลขรายการสั่งลำดับ (1. item, 2. item)
+            str = str.replace(/^[ \t]*\d+\.[ \t]+/gm, '');
+            
+            return str;
+        }
+
         // Helpers สำหรับลบแหล่งอ้างอิงAll (Robust Cleaner)
         const REF_HEADING = /^[ \t]*(?:#{1,6}[ \t]*)?[*_]{0,3}[ \t]*(?:แหล่งอ้างอิง|แหล่งที่มา|แหล่งข้อมูลอ้างอิง|เอกสารอ้างอิง|รายการอ้างอิง|บรรณานุกรม|เชิงอรรถ|อ้างอิง|ที่มา|references?|sources?|bibliography|works cited|citations?|footnotes?|notes and references)[ \t]*[:：]?[*_]{0,3}[ \t]*$/i;
         const STOP_LATIN = new Set(['in','since','by','until','till','during','from','to','circa','ca','year','early','late','mid','about','around','after','before','between','as','of','the','and','or','an','on','at','for','with','jan','feb','mar','apr','may','jun','jul','aug','sep','sept','oct','nov','dec','january','february','march','april','june','july','august','september','october','november','december','fig','figure','table','vol','no','issue','ed','edition','page','p','pp']);
@@ -840,6 +883,11 @@
 
         function removeAllReferencesAll(text) {
             let cleaned = text;
+            
+            // เพิ่ม: ลบแท็ก HTML / XML ทั้งแบบคู่ เช่น <citation ...></citation> และแท็กเดี่ยว <tag />
+            cleaned = cleaned.replace(/<([a-zA-Z0-9_-]+)(?:\s+[^>]*?)?>[\s\S]*?<\/\1>/g, '');
+            cleaned = cleaned.replace(/<[^>]+>/g, '');
+
             // 1. ลบสัญลักษณ์ผิดพลาด ()
             cleaned = cleaned.replace(/\uFFFD+/g, '');
 
@@ -988,6 +1036,7 @@
                 case 'removeAIReferences': text = text.replace(/\]+\]/g, '').replace(/\[\d+\]/g, ''); break;
                 case 'removeReferencesAll': text = removeAllReferencesAll(text); break;
                 case 'convertNumbersToThaiText': text = convertNumberToTextEngine(text); break;
+                case 'convertToPlainText': text = convertToPlainTextEngine(text); break;
             }
 
             outputArea.value = text;
